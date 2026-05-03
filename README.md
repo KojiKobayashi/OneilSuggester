@@ -2,13 +2,20 @@
 
 O'Neil 流のスクリーニング基準を使い、日本株の買いシグナルをスコアリングするツールです。
 
+## Pages
+
+| ブランチ | URL | 更新タイミング |
+|---|---|---|
+| `main` | https://kojikobayashi.github.io/OneilSuggester/ | 毎朝自動実行（スケジュール） |
+| `develop` | https://kojikobayashi.github.io/OneilSuggester/develop/ | `develop` ブランチへのプッシュ時 |
+
 ---
 
 ## 機能
 
 - 日本株のOHLCVデータを取得し、O'Neil 流パターン（ベース・ブレイクアウト等）を検出
 - 各銘柄をスコアリングし、上位銘柄を `docs/data/latest.json` に出力
-- GitHub Actions で毎朝自動実行
+- GitHub Actions で毎朝自動実行（`main`）、および `develop` ブランチ更新時に自動実行
 
 ---
 
@@ -79,7 +86,9 @@ uv lock --upgrade
 
 ```
 OneilSuggester/
-├── .github/workflows/daily.yml  # GitHub Actions（毎朝自動実行）
+├── .github/workflows/
+│   ├── daily.yml            # GitHub Actions（毎朝自動実行・main ブランチ用）
+│   └── develop-pages.yml    # GitHub Actions（develop ブランチ更新時）
 ├── batch/
 │   └── run_daily.py             # バッチ処理エントリーポイント
 ├── src/
@@ -88,7 +97,8 @@ OneilSuggester/
 │   ├── scoring.py               # スコアリング
 │   └── patterns/                # パターン検出ロジック
 ├── docs/
-│   ├── index.html               # フロントエンド
+│   ├── index.html               # フロントエンド（main 用）
+│   ├── develop/                 # develop ブランチ用 Pages（自動生成）
 │   └── data/latest.json         # スクリーニング結果（自動更新）
 ├── data/
 │   └── stock_list.csv           # 銘柄リスト
