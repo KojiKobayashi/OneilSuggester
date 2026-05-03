@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OneilSuggester – 日本株スクリーナー</title>
+  <style>
+    /* ── Reset & base ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ─────────────────────────────────────────────────────────── */
+    header {
+      background: #1a1d27;
+      padding: 1.25rem 2rem;
+      border-bottom: 1px solid #2d3148;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #a78bfa;
+    }
+
+    #meta {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    /* ── Filter bar ─────────────────────────────────────────────────────── */
+    #filters {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      border: 1px solid #3d4263;
+      background: #1a1d27;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .filter-btn:hover {
+      background: #252840;
+      border-color: #7c3aed;
+      color: #e2e8f0;
+    }
+
+    .filter-btn.active {
+      background: #7c3aed;
+      border-color: #7c3aed;
+      color: #fff;
+    }
+
+    /* ── Table ──────────────────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 0.75rem;
+      border: 1px solid #2d3148;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    thead tr {
+      background: #1a1d27;
+    }
+
+    th {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: #7c8db5;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      border-bottom: 1px solid #2d3148;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #1e2235;
+      transition: background 0.1s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody tr:hover { background: #1a1d2f; }
+
+    td {
+      padding: 0.8rem 1rem;
+      vertical-align: middle;
+    }
+
+    /* ── Badges ─────────────────────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-long  { background: #14532d; color: #86efac; }
+    .badge-short { background: #450a0a; color: #fca5a5; }
+
+    /* ── Score bar ──────────────────────────────────────────────────────── */
+    .score-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 100px;
+    }
+
+    .score-bar {
+      flex: 1;
+      height: 6px;
+      border-radius: 9999px;
+      background: #2d3148;
+      overflow: hidden;
+    }
+
+    .score-fill {
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 0.3s;
+    }
+
+    .score-fill-long  { background: linear-gradient(90deg, #16a34a, #86efac); }
+    .score-fill-short { background: linear-gradient(90deg, #dc2626, #fca5a5); }
+
+    .score-val {
+      font-weight: 700;
+      font-size: 0.9rem;
+      min-width: 3ch;
+      text-align: right;
+    }
+
+    /* ── Signals ────────────────────────────────────────────────────────── */
+    .signals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+
+    .signal-tag {
+      background: #1e2235;
+      border: 1px solid #2d3148;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    /* ── Ticker link ────────────────────────────────────────────────────── */
+    .ticker-link {
+      color: #a78bfa;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .ticker-link:hover { text-decoration: underline; }
+
+    /* ── Empty / loading states ─────────────────────────────────────────── */
+    #status {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #4b5563;
+      font-size: 1rem;
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      th, td { padding: 0.65rem 0.6rem; }
+      .score-bar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📈 OneilSuggester</h1>
+  <span id="meta">データ読み込み中…</span>
+</header>
+
+<main>
+  <div id="filters">
+    <button class="filter-btn active" data-filter="all">すべて</button>
+    <button class="filter-btn" data-filter="long">ロング</button>
+    <button class="filter-btn" data-filter="short">ショート</button>
+  </div>
+
+  <div class="table-wrap">
+    <table id="results-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>銘柄コード</th>
+          <th>銘柄名</th>
+          <th>種別</th>
+          <th>スコア</th>
+          <th>シグナル</th>
+        </tr>
+      </thead>
+      <tbody id="results-body">
+        <tr><td colspan="6" id="status">データを取得中…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+  const DATA_URL = "data/latest.json";
+  let allItems = [];
+  let currentFilter = "all";
+
+  // ── Fetch data ────────────────────────────────────────────────────────────
+  async function loadData() {
+    try {
+      const res = await fetch(DATA_URL + "?t=" + Date.now());
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+
+      allItems = json.items || [];
+
+      const dt = json.generated_at
+        ? new Date(json.generated_at).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })
+        : "不明";
+      document.getElementById("meta").textContent =
+        `更新日時: ${dt} JST　|　${allItems.length} 銘柄`;
+
+      render();
+    } catch (err) {
+      document.getElementById("status").textContent =
+        "データの取得に失敗しました: " + err.message;
+    }
+  }
+
+  // ── Render table ──────────────────────────────────────────────────────────
+  function render() {
+    const body = document.getElementById("results-body");
+    const filtered = currentFilter === "all"
+      ? allItems
+      : allItems.filter(i => i.type === currentFilter);
+
+    if (filtered.length === 0) {
+      body.innerHTML = `<tr><td colspan="6" id="status">該当する銘柄がありません</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = filtered.map((item, idx) => {
+      const typeLong = item.type === "long";
+      const badgeClass = typeLong ? "badge-long" : "badge-short";
+      const fillClass  = typeLong ? "score-fill-long" : "score-fill-short";
+      const typeLabel  = typeLong ? "ロング" : "ショート";
+      const pct = Math.round((item.score || 0) * 100);
+
+      // Ticker → Yahoo Finance Japan link
+      const rawCode = (item.code || "").replace(".T", "");
+      const yLink = `https://finance.yahoo.co.jp/quote/${rawCode}.T`;
+
+      const signals = (item.signals || []).map(s =>
+        `<span class="signal-tag">${escHtml(s)}</span>`
+      ).join("");
+
+      return `
+        <tr>
+          <td style="color:#4b5563;font-size:.8rem">${idx + 1}</td>
+          <td>
+            <a class="ticker-link" href="${yLink}" target="_blank" rel="noopener noreferrer">
+              ${escHtml(item.code || "")}
+            </a>
+          </td>
+          <td>${escHtml(item.name || "")}</td>
+          <td><span class="badge ${badgeClass}">${typeLabel}</span></td>
+          <td>
+            <div class="score-wrap">
+              <div class="score-bar">
+                <div class="score-fill ${fillClass}" style="width:${pct}%"></div>
+              </div>
+              <span class="score-val">${(item.score || 0).toFixed(2)}</span>
+            </div>
+          </td>
+          <td><div class="signals">${signals}</div></td>
+        </tr>`;
+    }).join("");
+  }
+
+  // ── Filter buttons ────────────────────────────────────────────────────────
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentFilter = btn.dataset.filter;
+      render();
+    });
+  });
+
+  // ── Utility: HTML escape ──────────────────────────────────────────────────
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  loadData();
+</script>
+</body>
+</html>
