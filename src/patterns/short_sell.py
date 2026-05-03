@@ -36,6 +36,48 @@ W_RALLY_WEAKNESS = 0.3
 W_VOLUME_SPIKE = 0.3
 
 
+def is_downtrend(ma25_last: float, ma75_last: float) -> bool:
+    """Return True when MA25 is below MA75 (primary downtrend condition).
+
+    Args:
+        ma25_last: The most-recent MA25 value.
+        ma75_last: The most-recent MA75 value.
+    """
+    return float(ma25_last) < float(ma75_last)
+
+
+def has_cross_below(ma25: np.ndarray, ma75: np.ndarray) -> bool:
+    """Return True when MA25 crossed below MA75 at any point in the arrays.
+
+    Args:
+        ma25: Array of MA25 values (chronological order).
+        ma75: Array of MA75 values (same length as *ma25*).
+    """
+    return any(
+        ma25[i - 1] >= ma75[i - 1] and ma25[i] < ma75[i]
+        for i in range(1, len(ma25))
+    )
+
+
+def is_rally_capped(highs: pd.Series, ma25: pd.Series) -> bool:
+    """Return True when at least one high is at or below MA25 * 1.02.
+
+    Args:
+        highs: Series of daily High prices.
+        ma25: Series of MA25 values aligned with *highs*.
+    """
+    return bool((highs <= ma25 * 1.02).any())
+
+
+def has_lower_highs(highs: np.ndarray) -> bool:
+    """Return True when the most recent high is below the earliest high.
+
+    Args:
+        highs: Array of daily High prices (chronological order).
+    """
+    return bool(len(highs) >= 2 and highs[-1] < highs[0])
+
+
 def detect(df: pd.DataFrame) -> Optional[dict]:
     """Detect a short-sell pattern in *df* and return a result dict.
 
@@ -58,28 +100,22 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
 
     # ── Condition 1: MA25 < MA75 (downtrend) ─────────────────────────────────
     latest = valid.iloc[-1]
-    if latest["ma25"] >= latest["ma75"]:
+    if not is_downtrend(latest["ma25"], latest["ma75"]):
         return None
 
     # ── Condition 2: MA25 crossed below recently ─────────────────────────────
     recent = valid.iloc[-CROSS_LOOKBACK - 1 :]
-    ma25 = recent["ma25"].values
-    ma75 = recent["ma75"].values
-    has_cross_below = any(
-        ma25[i - 1] >= ma75[i - 1] and ma25[i] < ma75[i]
-        for i in range(1, len(ma25))
-    )
+    cross_below = has_cross_below(recent["ma25"].values, recent["ma75"].values)
 
     # ── Condition 3: Rally capped at MA25 ────────────────────────────────────
     recent20 = valid.iloc[-LOWER_HIGHS_WINDOW:]
-    rally_cap = (recent20["High"] <= recent20["ma25"] * 1.02).any()
+    rally_cap = is_rally_capped(recent20["High"], recent20["ma25"])
 
     # ── Condition 4: Lower highs ──────────────────────────────────────────────
-    highs = recent20["High"].values
-    lower_highs = bool(len(highs) >= 2 and highs[-1] < highs[0])
+    lower_highs = has_lower_highs(recent20["High"].values)
 
     # At least two of the three secondary conditions must hold
-    secondary_count = sum([has_cross_below, rally_cap, lower_highs])
+    secondary_count = sum([cross_below, rally_cap, lower_highs])
     if secondary_count < 2:
         return None
 
@@ -104,7 +140,7 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
     )
 
     signals: list[str] = ["MA25 < MA75"]
-    if has_cross_below:
+    if cross_below:
         signals.append("MA25 crossed below MA75")
     if rally_cap:
         signals.append("rally capped at MA25")

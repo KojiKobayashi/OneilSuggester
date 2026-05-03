@@ -88,7 +88,8 @@ uv lock --upgrade
 OneilSuggester/
 ├── .github/workflows/
 │   ├── daily.yml            # GitHub Actions（毎朝自動実行・main ブランチ用）
-│   └── develop-pages.yml    # GitHub Actions（develop ブランチ更新時）
+│   ├── develop-pages.yml    # GitHub Actions（develop ブランチ更新時）
+│   └── test.yml             # GitHub Actions（テスト自動実行）
 ├── batch/
 │   └── run_daily.py             # バッチ処理エントリーポイント
 ├── src/
@@ -96,6 +97,12 @@ OneilSuggester/
 │   ├── indicators.py            # テクニカル指標
 │   ├── scoring.py               # スコアリング
 │   └── patterns/                # パターン検出ロジック
+├── tests/
+│   ├── test_indicators.py       # indicators.py のユニットテスト
+│   ├── test_scoring.py          # scoring.py のユニットテスト
+│   └── patterns/
+│       ├── test_cup_with_handle.py  # カップウィズハンドルパターンのテスト
+│       └── test_short_sell.py       # ショートセルパターンのテスト
 ├── docs/
 │   ├── index.html               # フロントエンド（main 用）
 │   ├── develop/                 # develop ブランチ用 Pages（自動生成）
