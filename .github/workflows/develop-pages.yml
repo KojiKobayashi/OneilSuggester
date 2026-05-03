@@ -1,0 +1,62 @@
+name: Develop Branch Pages
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: develop-pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out develop branch
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run daily batch
+        run: uv run python batch/run_daily.py
+
+      - name: Publish develop results to Pages
+        run: |
+          # Save artefacts before switching branches
+          mkdir -p /tmp/develop-pages/data
+          cp docs/data/latest.json /tmp/develop-pages/data/latest.json
+          cp docs/index.html       /tmp/develop-pages/index.html
+
+          # Discard uncommitted changes and switch to main
+          git reset --hard HEAD
+          git fetch origin main
+          git checkout -B main origin/main
+
+          # Update docs/develop/ with develop branch artefacts
+          mkdir -p docs/develop/data
+          cp /tmp/develop-pages/index.html          docs/develop/index.html
+          cp /tmp/develop-pages/data/latest.json    docs/develop/data/latest.json
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/develop/
+          git diff --cached --quiet || git commit -m "chore: update develop pages [skip ci]"
+          git push origin main
