@@ -1,0 +1,17 @@
+[project]
+name = "oneilsuggester"
+version = "0.1.0"
+description = "O'Neil-style Japanese stock screener"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "yfinance>=0.2.28",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "PyYAML>=6.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0",
+]
