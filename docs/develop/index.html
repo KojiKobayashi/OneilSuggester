@@ -198,6 +198,34 @@
       font-size: 1rem;
     }
 
+    /* ── Date selector ──────────────────────────────────────────────────── */
+    #date-selector-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    #date-label {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    #date-select {
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid #3d4263;
+      background: #1a1d27;
+      color: #e2e8f0;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    #date-select:focus {
+      outline: none;
+      border-color: #7c3aed;
+    }
+
     /* ── Responsive ─────────────────────────────────────────────────────── */
     @media (max-width: 640px) {
       th, td { padding: 0.65rem 0.6rem; }
@@ -209,7 +237,15 @@
 
 <header>
   <h1>📈 OneilSuggester</h1>
-  <span id="meta">データ読み込み中…</span>
+  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+    <div id="date-selector-wrap">
+      <label id="date-label" for="date-select">日付:</label>
+      <select id="date-select" title="表示する日付を選択">
+        <option value="">読み込み中…</option>
+      </select>
+    </div>
+    <span id="meta">データ読み込み中…</span>
+  </div>
 </header>
 
 <main>
@@ -239,14 +275,46 @@
 </main>
 
 <script>
-  const DATA_URL = "data/latest.json";
+  const DATA_DIR = "data/";
+  const INDEX_URL = DATA_DIR + "index.json";
   let allItems = [];
   let currentFilter = "all";
 
-  // ── Fetch data ────────────────────────────────────────────────────────────
-  async function loadData() {
+  // ── Load index and populate date selector ─────────────────────────────────
+  async function loadIndex() {
+    const sel = document.getElementById("date-select");
     try {
-      const res = await fetch(DATA_URL + "?t=" + Date.now());
+      const res = await fetch(INDEX_URL + "?t=" + Date.now());
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const index = await res.json();
+      const dates = index.dates || [];
+
+      sel.innerHTML = "";
+      dates.forEach((d, i) => {
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        if (i === 0) opt.selected = true;
+        sel.appendChild(opt);
+      });
+
+      if (dates.length > 0) {
+        await loadData(dates[0]);
+      } else {
+        document.getElementById("status").textContent = "利用可能なデータがありません";
+      }
+    } catch (err) {
+      sel.innerHTML = '<option value="">取得失敗</option>';
+      document.getElementById("status").textContent =
+        "インデックスの取得に失敗しました: " + err.message;
+    }
+  }
+
+  // ── Fetch data for a specific date ────────────────────────────────────────
+  async function loadData(dateStr) {
+    try {
+      const url = DATA_DIR + dateStr + ".json" + "?t=" + Date.now();
+      const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
 
@@ -255,8 +323,10 @@
       const dt = json.generated_at
         ? new Date(json.generated_at).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })
         : "不明";
+      const longCount  = allItems.filter(i => i.type === "long").length;
+      const shortCount = allItems.filter(i => i.type === "short").length;
       document.getElementById("meta").textContent =
-        `更新日時: ${dt} JST　|　${allItems.length} 銘柄`;
+        `更新日時: ${dt} JST　|　ロング ${longCount} 銘柄 / ショート ${shortCount} 銘柄`;
 
       render();
     } catch (err) {
@@ -315,6 +385,12 @@
     }).join("");
   }
 
+  // ── Date selector ─────────────────────────────────────────────────────────
+  document.getElementById("date-select").addEventListener("change", (e) => {
+    const dateStr = e.target.value;
+    if (dateStr) loadData(dateStr);
+  });
+
   // ── Filter buttons ────────────────────────────────────────────────────────
   document.querySelectorAll(".filter-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -334,7 +410,7 @@
       .replace(/"/g, "&quot;");
   }
 
-  loadData();
+  loadIndex();
 </script>
 </body>
 </html>
