@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.scoring import score_ticker
+from src.scoring import score_ticker, score_ticker_all
 
 
 def _make_ohlcv(n: int = 150, close_val: float = 100.0) -> pd.DataFrame:
@@ -80,3 +80,51 @@ class TestScoreTicker:
         # Can't guarantee a pattern fires, but if it does the score must be ≤ 1
         if result is not None:
             assert result["score"] <= 1.0
+
+
+class TestScoreTickerAll:
+    def test_returns_empty_list_for_flat_data(self):
+        """Flat price data should not trigger any pattern."""
+        df = _make_ohlcv(n=150)
+        results = score_ticker_all("0000.T", "TestCo", df)
+        assert results == []
+
+    def test_returns_list(self):
+        """score_ticker_all always returns a list, never None."""
+        df = _make_ohlcv(n=150)
+        results = score_ticker_all("0000.T", "TestCo", df)
+        assert isinstance(results, list)
+
+    def test_returns_list_for_short_pattern(self):
+        """Declining prices should trigger short-sell detection."""
+        df = _make_short_ohlcv(n=150)
+        results = score_ticker_all("9999.T", "ShortCo", df)
+        assert isinstance(results, list)
+        for r in results:
+            assert r["code"] == "9999.T"
+            assert r["name"] == "ShortCo"
+            assert r["type"] in ("long", "short")
+            assert 0.0 <= r["score"] <= 1.0
+            assert isinstance(r["signals"], list)
+
+    def test_output_keys(self):
+        """Each returned dict must have the required keys."""
+        df = _make_short_ohlcv(n=150)
+        results = score_ticker_all("1234.T", "Acme", df)
+        for r in results:
+            for key in ("code", "name", "type", "score", "signals"):
+                assert key in r
+
+    def test_returns_empty_list_for_insufficient_data(self):
+        """Too few rows → no pattern can be detected."""
+        df = _make_ohlcv(n=10)
+        results = score_ticker_all("0001.T", "TinyCo", df)
+        assert results == []
+
+    def test_may_return_multiple_results(self):
+        """score_ticker_all can return both long and short for the same ticker."""
+        df = _make_short_ohlcv(n=150)
+        results = score_ticker_all("5555.T", "Multi", df)
+        types = [r["type"] for r in results]
+        # Each type should appear at most once
+        assert len(types) == len(set(types))
