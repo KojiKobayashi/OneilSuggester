@@ -5,12 +5,17 @@ import pandas as pd
 import pytest
 
 from src.patterns.cup_with_handle import (
+    BREAKOUT_VOL_RATIO,
     CUP_WINDOW,
     HANDLE_WINDOW,
     MAX_DRAWDOWN,
     MAX_HANDLE_DROP,
     MIN_BASE_DAYS,
     MIN_DRAWDOWN,
+    calc_breakout_strength,
+    calc_cup_shape,
+    calc_handle_quality,
+    calc_volume_pattern,
     detect,
     has_sufficient_base,
     is_handle_valid,
@@ -125,6 +130,99 @@ class TestIsHandleValid:
     def test_insufficient_rows_returns_false(self):
         df = _make_cup_df()
         assert is_handle_valid(df.iloc[:HANDLE_WINDOW - 1]) is False
+
+
+# ── Scoring function tests ─────────────────────────────────────────────────────
+
+class TestCalcCupShape:
+    def test_ideal_drawdown_scores_one(self):
+        # _make_cup_df has a ~25 % drawdown (120 → 90), which is the ideal.
+        df = _make_cup_df()
+        score = calc_cup_shape(df)
+        assert score == pytest.approx(1.0, abs=1e-6)
+
+    def test_score_in_valid_range(self):
+        df = _make_cup_df()
+        assert 0.0 <= calc_cup_shape(df) <= 1.0
+
+    def test_deep_drawdown_gives_lower_score(self):
+        df = _make_cup_df()
+        cup_start = len(df) - CUP_WINDOW
+        df.iloc[cup_start + 20:cup_start + 80, df.columns.get_loc("Close")] = 50.0
+        assert calc_cup_shape(df) < 0.5
+
+    def test_insufficient_rows_returns_zero(self):
+        df = _make_cup_df()
+        assert calc_cup_shape(df.iloc[:CUP_WINDOW - 1]) == 0.0
+
+
+class TestCalcHandleQuality:
+    def test_tight_handle_gives_high_score(self):
+        df = _make_cup_df()
+        score = calc_handle_quality(df)
+        assert 0.0 < score <= 1.0
+
+    def test_zero_drop_gives_score_one(self):
+        df = _make_cup_df()
+        df.iloc[-HANDLE_WINDOW:, df.columns.get_loc("High")] = 100.0
+        df.iloc[-HANDLE_WINDOW:, df.columns.get_loc("Low")] = 100.0
+        assert calc_handle_quality(df) == pytest.approx(1.0)
+
+    def test_drop_at_max_gives_score_zero(self):
+        # handle_high=100, handle_low=88 → drop=12%=MAX_HANDLE_DROP → score=0
+        df = _make_cup_df()
+        df.iloc[-HANDLE_WINDOW:, df.columns.get_loc("High")] = 100.0
+        df.iloc[-HANDLE_WINDOW:, df.columns.get_loc("Low")] = 88.0
+        assert calc_handle_quality(df) == pytest.approx(0.0, abs=1e-6)
+
+    def test_insufficient_rows_returns_zero(self):
+        df = _make_cup_df()
+        assert calc_handle_quality(df.iloc[:HANDLE_WINDOW - 1]) == 0.0
+
+
+class TestCalcVolumePattern:
+    def test_contraction_and_breakout_gives_full_score(self):
+        # vol=500 < vol_ma=600 → contraction; last vol=700 > vol_ma=600 → breakout
+        df = _make_cup_df()
+        assert calc_volume_pattern(df) == pytest.approx(1.0)
+
+    def test_no_contraction_no_breakout_gives_zero(self):
+        df = _make_cup_df()
+        df["Volume"] = 700.0           # always above vol_ma=600 → no contraction
+        df.iloc[-1, df.columns.get_loc("Volume")] = 500.0  # last < vol_ma → no breakout
+        assert calc_volume_pattern(df) == pytest.approx(0.0)
+
+    def test_contraction_only_gives_half_score(self):
+        df = _make_cup_df()
+        df["Volume"] = 500.0           # always below vol_ma=600 → contraction
+        df.iloc[-1, df.columns.get_loc("Volume")] = 500.0  # last < vol_ma → no breakout
+        assert calc_volume_pattern(df) == pytest.approx(0.5)
+
+    def test_insufficient_rows_returns_zero(self):
+        df = _make_cup_df()
+        assert calc_volume_pattern(df.iloc[:CUP_WINDOW - 1]) == 0.0
+
+
+class TestCalcBreakoutStrength:
+    def test_score_in_valid_range(self):
+        df = _make_cup_df()
+        assert 0.0 <= calc_breakout_strength(df) <= 1.0
+
+    def test_double_volume_gives_max_score(self):
+        df = _make_cup_df()
+        df.iloc[-1, df.columns.get_loc("Volume")] = 1200.0  # 2× vol_ma=600
+        assert calc_breakout_strength(df) == pytest.approx(1.0)
+
+    def test_zero_vol_ma_gives_zero(self):
+        df = _make_cup_df()
+        df["vol_ma"] = 0.0
+        assert calc_breakout_strength(df) == pytest.approx(0.0)
+
+    def test_half_vol_gives_quarter_score(self):
+        # vol=300, vol_ma=600 → rel_vol=0.5 → min(1.0, 0.5/2.0)=0.25
+        df = _make_cup_df()
+        df.iloc[-1, df.columns.get_loc("Volume")] = 300.0
+        assert calc_breakout_strength(df) == pytest.approx(0.25)
 
 
 # ── detect() integration tests ─────────────────────────────────────────────────

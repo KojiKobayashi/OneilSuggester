@@ -92,6 +92,56 @@ def has_lower_highs(df: pd.DataFrame) -> bool:
     return bool(len(highs) >= 2 and highs[-1] < highs[0])
 
 
+def calc_downtrend_strength(df: pd.DataFrame) -> float:
+    """Return the downtrend-strength sub-score [0, 1].
+
+    Measures the gap between MA75 and MA25 relative to MA75. A gap of 5 % or
+    more normalises to 1.0; smaller gaps scale linearly.
+
+    Args:
+        df: DataFrame with columns ``ma25`` and ``ma75``.
+    """
+    valid = df.dropna(subset=["ma25", "ma75"])
+    if valid.empty:
+        return 0.0
+    latest = valid.iloc[-1]
+    ma_gap = (latest["ma75"] - latest["ma25"]) / latest["ma75"]
+    return float(min(1.0, ma_gap / 0.05))
+
+
+def calc_rally_weakness(df: pd.DataFrame) -> float:
+    """Return the rally-weakness sub-score [0, 1].
+
+    Fraction of days in the recent ``LOWER_HIGHS_WINDOW`` window where
+    ``Close`` is at or below ``MA25``.
+
+    Args:
+        df: DataFrame with columns ``Close``, ``ma25``, ``ma75``.
+    """
+    valid = df.dropna(subset=["ma25", "ma75"])
+    recent20 = valid.iloc[-LOWER_HIGHS_WINDOW:]
+    if recent20.empty:
+        return 0.0
+    return float((recent20["Close"] <= recent20["ma25"]).mean())
+
+
+def calc_volume_spike(df: pd.DataFrame) -> float:
+    """Return the volume-spike sub-score [0, 1]: relative volume on the last day.
+
+    Relative volume of 2× (or more) gives a score of 1.0; lower values scale
+    linearly down to 0.0.
+
+    Args:
+        df: DataFrame with columns ``Volume`` and ``vol_ma``.
+    """
+    if df.empty:
+        return 0.0
+    last_vol_ma = df["vol_ma"].iloc[-1]
+    last_vol = df["Volume"].iloc[-1]
+    rel_vol = (last_vol / last_vol_ma) if last_vol_ma > 0 else 0.0
+    return float(min(1.0, rel_vol / 2.0))
+
+
 def detect(df: pd.DataFrame) -> Optional[dict]:
     """Detect a short-sell pattern in *df* and return a result dict.
 
@@ -131,21 +181,9 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
         return None
 
     # ── Sub-scores ────────────────────────────────────────────────────────────
-    latest = valid.iloc[-1]
-    recent20 = valid.iloc[-LOWER_HIGHS_WINDOW:]
-
-    # downtrend_strength: gap between MA25 and MA75 relative to MA75
-    ma_gap = (latest["ma75"] - latest["ma25"]) / latest["ma75"]
-    downtrend_strength = min(1.0, ma_gap / 0.05)  # normalise to ~5 % gap = 1.0
-
-    # rally_weakness: fraction of recent days where Close ≤ MA25
-    rally_weakness = float((recent20["Close"] <= recent20["ma25"]).mean())
-
-    # volume_spike: latest relative volume (bearish volume confirmation)
-    last_vol_ma = df["vol_ma"].iloc[-1]
-    last_vol = df["Volume"].iloc[-1]
-    rel_vol = (last_vol / last_vol_ma) if last_vol_ma > 0 else 0.0
-    volume_spike = min(1.0, rel_vol / 2.0)
+    downtrend_strength = calc_downtrend_strength(df)
+    rally_weakness = calc_rally_weakness(df)
+    volume_spike = calc_volume_spike(df)
 
     score = (
         downtrend_strength * W_DOWNTREND

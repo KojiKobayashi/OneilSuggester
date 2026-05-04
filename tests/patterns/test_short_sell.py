@@ -7,6 +7,9 @@ import pytest
 from src.patterns.short_sell import (
     CROSS_LOOKBACK,
     LOWER_HIGHS_WINDOW,
+    calc_downtrend_strength,
+    calc_rally_weakness,
+    calc_volume_spike,
     detect,
     has_cross_below,
     has_lower_highs,
@@ -132,6 +135,76 @@ class TestHasLowerHighs:
     def test_insufficient_valid_rows_returns_false(self):
         df = _make_df(n=1, ma25=95.0, ma75=100.0)
         assert has_lower_highs(df) is False
+
+
+# ── Scoring function tests ─────────────────────────────────────────────────────
+
+class TestCalcDowntrendStrength:
+    def test_large_gap_gives_max_score(self):
+        # ma75=100, ma25=90 → gap=10% → min(1.0, 0.10/0.05)=1.0
+        df = _make_df(ma25=90.0, ma75=100.0)
+        assert calc_downtrend_strength(df) == pytest.approx(1.0)
+
+    def test_small_gap_scales_linearly(self):
+        # ma75=100, ma25=97.5 → gap=2.5% → 2.5/5=0.5
+        df = _make_df(ma25=97.5, ma75=100.0)
+        assert calc_downtrend_strength(df) == pytest.approx(0.5)
+
+    def test_no_gap_gives_zero(self):
+        df = _make_df(ma25=100.0, ma75=100.0)
+        assert calc_downtrend_strength(df) == pytest.approx(0.0)
+
+    def test_empty_valid_rows_returns_zero(self):
+        df = _make_df()
+        df["ma25"] = np.nan
+        df["ma75"] = np.nan
+        assert calc_downtrend_strength(df) == pytest.approx(0.0)
+
+
+class TestCalcRallyWeakness:
+    def test_all_closes_below_ma25_gives_one(self):
+        # close=95, ma25=100 → 95 ≤ 100 for all rows → 1.0
+        df = _make_df(ma25=100.0, ma75=105.0)
+        assert calc_rally_weakness(df) == pytest.approx(1.0)
+
+    def test_no_closes_below_ma25_gives_zero(self):
+        # close=95, ma25=90 → 95 > 90 for all rows → 0.0
+        df = _make_df(ma25=90.0, ma75=100.0)
+        assert calc_rally_weakness(df) == pytest.approx(0.0)
+
+    def test_empty_valid_rows_returns_zero(self):
+        df = _make_df()
+        df["ma25"] = np.nan
+        df["ma75"] = np.nan
+        assert calc_rally_weakness(df) == pytest.approx(0.0)
+
+    def test_score_in_valid_range(self):
+        df = _make_df(ma25=97.0, ma75=100.0)
+        assert 0.0 <= calc_rally_weakness(df) <= 1.0
+
+
+class TestCalcVolumeSpike:
+    def test_double_volume_gives_max_score(self):
+        # vol=2000, vol_ma=1000 → rel_vol=2.0 → min(1.0, 2.0/2.0)=1.0
+        df = _make_df()
+        df["Volume"] = 2000.0
+        assert calc_volume_spike(df) == pytest.approx(1.0)
+
+    def test_equal_volume_gives_half_score(self):
+        # vol=1000, vol_ma=1000 → rel_vol=1.0 → min(1.0, 1.0/2.0)=0.5
+        df = _make_df()
+        df["Volume"] = 1000.0
+        df["vol_ma"] = 1000.0
+        assert calc_volume_spike(df) == pytest.approx(0.5)
+
+    def test_zero_vol_ma_gives_zero(self):
+        df = _make_df()
+        df["vol_ma"] = 0.0
+        assert calc_volume_spike(df) == pytest.approx(0.0)
+
+    def test_score_in_valid_range(self):
+        df = _make_df()
+        assert 0.0 <= calc_volume_spike(df) <= 1.0
 
 
 # ── detect() integration tests ─────────────────────────────────────────────────

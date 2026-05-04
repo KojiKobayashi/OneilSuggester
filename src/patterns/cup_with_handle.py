@@ -100,6 +100,84 @@ def is_handle_valid(df: pd.DataFrame) -> bool:
     return bool(handle_drop <= MAX_HANDLE_DROP)
 
 
+def calc_cup_shape(df: pd.DataFrame) -> float:
+    """Return the cup-shape sub-score [0, 1]: ideal drawdown ≈ 25 %.
+
+    A drawdown of exactly 25 % scores 1.0; scores decrease linearly as the
+    drawdown deviates from the ideal.
+
+    Args:
+        df: DataFrame with at least ``CUP_WINDOW`` rows and a ``Close`` column.
+    """
+    if len(df) < CUP_WINDOW:
+        return 0.0
+    cup_df = df.iloc[-CUP_WINDOW:]
+    left_peak_idx = cup_df["Close"].iloc[:CUP_WINDOW // 2].idxmax()
+    left_peak_price = cup_df.loc[left_peak_idx, "Close"]
+    left_loc = cup_df.index.get_loc(left_peak_idx)
+    bottom_price = cup_df.iloc[left_loc:]["Close"].min()
+    drawdown = (left_peak_price - bottom_price) / left_peak_price
+    ideal_drawdown = 0.25
+    return float(max(0.0, 1.0 - abs(drawdown - ideal_drawdown) / ideal_drawdown))
+
+
+def calc_handle_quality(df: pd.DataFrame) -> float:
+    """Return the handle-quality sub-score [0, 1]: smaller handle drop = higher score.
+
+    A handle drop of 0 % scores 1.0; a drop equal to ``MAX_HANDLE_DROP`` scores 0.0.
+
+    Args:
+        df: DataFrame with at least ``HANDLE_WINDOW`` rows and ``High``/``Low`` columns.
+    """
+    if len(df) < HANDLE_WINDOW:
+        return 0.0
+    handle_df = df.iloc[-HANDLE_WINDOW:]
+    handle_high = handle_df["High"].max()
+    handle_low = handle_df["Low"].min()
+    handle_drop = (handle_high - handle_low) / handle_high if handle_high > 0 else 1.0
+    return float(max(0.0, 1.0 - handle_drop / MAX_HANDLE_DROP))
+
+
+def calc_volume_pattern(df: pd.DataFrame) -> float:
+    """Return the volume-pattern sub-score [0, 1].
+
+    Adds 0.5 for volume contraction during the cup and 0.5 for a volume
+    expansion on the most recent (breakout) day.
+
+    Args:
+        df: DataFrame with at least ``CUP_WINDOW`` rows and ``Volume``/``vol_ma``
+            columns.
+    """
+    if len(df) < CUP_WINDOW:
+        return 0.0
+    cup_df = df.iloc[-CUP_WINDOW:]
+    cup_rel_vol = (cup_df["Volume"] / cup_df["vol_ma"].replace(0, np.nan)).mean()
+    last_vol_ma = df["vol_ma"].iloc[-1]
+    last_rel_vol = df["Volume"].iloc[-1] / last_vol_ma if last_vol_ma > 0 else 0.0
+    score = 0.0
+    if cup_rel_vol < 1.0:
+        score += 0.5
+    if last_rel_vol >= BREAKOUT_VOL_RATIO:
+        score += 0.5
+    return float(score)
+
+
+def calc_breakout_strength(df: pd.DataFrame) -> float:
+    """Return the breakout-strength sub-score [0, 1]: relative volume on the last day.
+
+    Relative volume of 2× (or more) gives a score of 1.0; lower values scale
+    linearly down to 0.0.
+
+    Args:
+        df: DataFrame with ``Volume`` and ``vol_ma`` columns.
+    """
+    if df.empty:
+        return 0.0
+    last_vol_ma = df["vol_ma"].iloc[-1]
+    last_rel_vol = df["Volume"].iloc[-1] / last_vol_ma if last_vol_ma > 0 else 0.0
+    return float(min(1.0, last_rel_vol / 2.0))
+
+
 def detect(df: pd.DataFrame) -> Optional[dict]:
     """Detect a cup-with-handle pattern in *df* and return a result dict.
 
@@ -125,48 +203,19 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
     if not is_handle_valid(df):
         return None
 
-    # ── Derive values needed for scoring ──────────────────────────────────────
-    cup_df = df.iloc[-CUP_WINDOW:].copy()
+    # ── Scoring ───────────────────────────────────────────────────────────────
+    cup_shape = calc_cup_shape(df)
+    handle_quality = calc_handle_quality(df)
+    volume_pattern = calc_volume_pattern(df)
+    breakout_strength = calc_breakout_strength(df)
 
-    left_peak_idx = cup_df["Close"].iloc[:CUP_WINDOW // 2].idxmax()
-    left_peak_price = cup_df.loc[left_peak_idx, "Close"]
-    left_loc = cup_df.index.get_loc(left_peak_idx)
-    bottom_price = cup_df.iloc[left_loc:]["Close"].min()
-    drawdown = (left_peak_price - bottom_price) / left_peak_price
-
-    handle_df = df.iloc[-HANDLE_WINDOW:]
-    handle_high = handle_df["High"].max()
-    handle_low = handle_df["Low"].min()
-    handle_drop = (handle_high - handle_low) / handle_high if handle_high > 0 else 1.0
-
-    # ── Volume pattern ────────────────────────────────────────────────────────
-    # Average relative volume during cup formation vs baseline
+    # Signal booleans derived from raw data (for the signals list)
+    cup_df = df.iloc[-CUP_WINDOW:]
     cup_rel_vol = (cup_df["Volume"] / cup_df["vol_ma"].replace(0, np.nan)).mean()
-    last_rel_vol = (
-        df["Volume"].iloc[-1] / df["vol_ma"].iloc[-1]
-        if df["vol_ma"].iloc[-1] > 0
-        else 0.0
-    )
+    last_vol_ma = df["vol_ma"].iloc[-1]
+    last_rel_vol = df["Volume"].iloc[-1] / last_vol_ma if last_vol_ma > 0 else 0.0
     volume_contraction = cup_rel_vol < 1.0
     breakout_vol = last_rel_vol >= BREAKOUT_VOL_RATIO
-
-    # ── Sub-scores ────────────────────────────────────────────────────────────
-    # cup_shape: how symmetric / ideal the drawdown is (0.25 = best ≈ ideal mid-range)
-    ideal_drawdown = 0.25
-    cup_shape = max(0.0, 1.0 - abs(drawdown - ideal_drawdown) / ideal_drawdown)
-
-    # handle_quality: smaller drop → higher score
-    handle_quality = max(0.0, 1.0 - handle_drop / MAX_HANDLE_DROP)
-
-    # volume_pattern: contraction during cup + expansion at breakout
-    volume_pattern = 0.0
-    if volume_contraction:
-        volume_pattern += 0.5
-    if breakout_vol:
-        volume_pattern += 0.5
-
-    # breakout_strength: relative volume on breakout day
-    breakout_strength = min(1.0, last_rel_vol / 2.0)
 
     score = (
         cup_shape * W_CUP_SHAPE
