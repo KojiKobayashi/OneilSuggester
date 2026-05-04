@@ -37,12 +37,145 @@ MIN_BASE_DAYS = 20        # minimum days forming the base of the cup
 HANDLE_WINDOW = 20        # look-back window for handle detection
 MAX_HANDLE_DROP = 0.12    # maximum handle decline (12 %)
 BREAKOUT_VOL_RATIO = 1.0  # relative-volume threshold at breakout
+BASE_TOLERANCE = 1.10     # price must be within 10 % of the bottom to count as base
 
 # ── Score weights ──────────────────────────────────────────────────────────────
 W_CUP_SHAPE = 0.3
 W_HANDLE_QUALITY = 0.2
 W_VOLUME_PATTERN = 0.2
 W_BREAKOUT_STRENGTH = 0.3
+
+
+def is_valid_drawdown(df: pd.DataFrame) -> bool:
+    """Return True when the cup drawdown is within the valid range (10%–35%).
+
+    Args:
+        df: DataFrame with at least ``CUP_WINDOW`` rows and a ``Close`` column.
+    """
+    if len(df) < CUP_WINDOW:
+        return False
+    cup_df = df.iloc[-CUP_WINDOW:]
+    left_peak_idx = cup_df["Close"].iloc[:CUP_WINDOW // 2].idxmax()
+    left_peak_price = cup_df.loc[left_peak_idx, "Close"]
+    left_loc = cup_df.index.get_loc(left_peak_idx)
+    right_portion = cup_df.iloc[left_loc:]
+    if len(right_portion) < MIN_BASE_DAYS:
+        return False
+    bottom_price = right_portion["Close"].min()
+    drawdown = (left_peak_price - bottom_price) / left_peak_price
+    return bool(MIN_DRAWDOWN <= drawdown <= MAX_DRAWDOWN)
+
+
+def has_sufficient_base(df: pd.DataFrame) -> bool:
+    """Return True when enough trading days are near the cup bottom.
+
+    Args:
+        df: DataFrame with at least ``CUP_WINDOW`` rows and a ``Close`` column.
+    """
+    if len(df) < CUP_WINDOW:
+        return False
+    cup_df = df.iloc[-CUP_WINDOW:]
+    left_peak_idx = cup_df["Close"].iloc[:CUP_WINDOW // 2].idxmax()
+    left_loc = cup_df.index.get_loc(left_peak_idx)
+    right_portion = cup_df.iloc[left_loc:]
+    if len(right_portion) < MIN_BASE_DAYS:
+        return False
+    bottom_price = right_portion["Close"].min()
+    base_days = int((cup_df["Close"] <= bottom_price * BASE_TOLERANCE).sum())
+    return bool(base_days >= MIN_BASE_DAYS)
+
+
+def is_handle_valid(df: pd.DataFrame) -> bool:
+    """Return True when the handle decline is within the allowed maximum (12%).
+
+    Args:
+        df: DataFrame with at least ``HANDLE_WINDOW`` rows and ``High``/``Low`` columns.
+    """
+    if len(df) < HANDLE_WINDOW:
+        return False
+    handle_df = df.iloc[-HANDLE_WINDOW:]
+    handle_high = handle_df["High"].max()
+    handle_low = handle_df["Low"].min()
+    handle_drop = (handle_high - handle_low) / handle_high if handle_high > 0 else 1.0
+    return bool(handle_drop <= MAX_HANDLE_DROP)
+
+
+def calc_cup_shape(df: pd.DataFrame) -> float:
+    """Return the cup-shape sub-score [0, 1]: ideal drawdown ≈ 25 %.
+
+    A drawdown of exactly 25 % scores 1.0; scores decrease linearly as the
+    drawdown deviates from the ideal.
+
+    Args:
+        df: DataFrame with at least ``CUP_WINDOW`` rows and a ``Close`` column.
+    """
+    if len(df) < CUP_WINDOW:
+        return 0.0
+    cup_df = df.iloc[-CUP_WINDOW:]
+    left_peak_idx = cup_df["Close"].iloc[:CUP_WINDOW // 2].idxmax()
+    left_peak_price = cup_df.loc[left_peak_idx, "Close"]
+    left_loc = cup_df.index.get_loc(left_peak_idx)
+    bottom_price = cup_df.iloc[left_loc:]["Close"].min()
+    drawdown = (left_peak_price - bottom_price) / left_peak_price
+    ideal_drawdown = 0.25
+    return float(max(0.0, 1.0 - abs(drawdown - ideal_drawdown) / ideal_drawdown))
+
+
+def calc_handle_quality(df: pd.DataFrame) -> float:
+    """Return the handle-quality sub-score [0, 1]: smaller handle drop = higher score.
+
+    A handle drop of 0 % scores 1.0; a drop equal to ``MAX_HANDLE_DROP`` scores 0.0.
+
+    Args:
+        df: DataFrame with at least ``HANDLE_WINDOW`` rows and ``High``/``Low`` columns.
+    """
+    if len(df) < HANDLE_WINDOW:
+        return 0.0
+    handle_df = df.iloc[-HANDLE_WINDOW:]
+    handle_high = handle_df["High"].max()
+    handle_low = handle_df["Low"].min()
+    handle_drop = (handle_high - handle_low) / handle_high if handle_high > 0 else 1.0
+    return float(max(0.0, 1.0 - handle_drop / MAX_HANDLE_DROP))
+
+
+def calc_volume_pattern(df: pd.DataFrame) -> float:
+    """Return the volume-pattern sub-score [0, 1].
+
+    Adds 0.5 for volume contraction during the cup and 0.5 for a volume
+    expansion on the most recent (breakout) day.
+
+    Args:
+        df: DataFrame with at least ``CUP_WINDOW`` rows and ``Volume``/``vol_ma``
+            columns.
+    """
+    if len(df) < CUP_WINDOW:
+        return 0.0
+    cup_df = df.iloc[-CUP_WINDOW:]
+    cup_rel_vol = (cup_df["Volume"] / cup_df["vol_ma"].replace(0, np.nan)).mean()
+    last_vol_ma = df["vol_ma"].iloc[-1]
+    last_rel_vol = df["Volume"].iloc[-1] / last_vol_ma if last_vol_ma > 0 else 0.0
+    score = 0.0
+    if cup_rel_vol < 1.0:
+        score += 0.5
+    if last_rel_vol >= BREAKOUT_VOL_RATIO:
+        score += 0.5
+    return float(score)
+
+
+def calc_breakout_strength(df: pd.DataFrame) -> float:
+    """Return the breakout-strength sub-score [0, 1]: relative volume on the last day.
+
+    Relative volume of 2× (or more) gives a score of 1.0; lower values scale
+    linearly down to 0.0.
+
+    Args:
+        df: DataFrame with ``Volume`` and ``vol_ma`` columns.
+    """
+    if df.empty:
+        return 0.0
+    last_vol_ma = df["vol_ma"].iloc[-1]
+    last_rel_vol = df["Volume"].iloc[-1] / last_vol_ma if last_vol_ma > 0 else 0.0
+    return float(min(1.0, last_rel_vol / 2.0))
 
 
 def detect(df: pd.DataFrame) -> Optional[dict]:
@@ -60,68 +193,29 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
     if len(df) < CUP_WINDOW:
         return None
 
-    cup_df = df.iloc[-CUP_WINDOW:].copy()
-
-    # ── Identify left peak ────────────────────────────────────────────────────
-    left_peak_idx = cup_df["Close"].iloc[: CUP_WINDOW // 2].idxmax()
-    left_peak_price = cup_df.loc[left_peak_idx, "Close"]
-    left_loc = cup_df.index.get_loc(left_peak_idx)
-
-    # The bottom must occur *after* the left peak
-    right_portion = cup_df.iloc[left_loc:]
-    if len(right_portion) < MIN_BASE_DAYS:
+    # ── Condition checks ──────────────────────────────────────────────────────
+    if not is_valid_drawdown(df):
         return None
 
-    bottom_idx = right_portion["Close"].idxmin()
-    bottom_price = right_portion.loc[bottom_idx, "Close"]
-    bottom_loc = cup_df.index.get_loc(bottom_idx)
-
-    # ── Drawdown check ────────────────────────────────────────────────────────
-    drawdown = (left_peak_price - bottom_price) / left_peak_price
-    if not (MIN_DRAWDOWN <= drawdown <= MAX_DRAWDOWN):
+    if not has_sufficient_base(df):
         return None
 
-    # ── Base width: days within 10 % of the bottom across the full cup ───────
-    base_days = int((cup_df["Close"] <= bottom_price * 1.10).sum())
-    if base_days < MIN_BASE_DAYS:
+    if not is_handle_valid(df):
         return None
 
-    # ── Handle detection ─────────────────────────────────────────────────────
-    handle_df = df.iloc[-HANDLE_WINDOW:]
-    handle_high = handle_df["High"].max()
-    handle_low = handle_df["Low"].min()
-    handle_drop = (handle_high - handle_low) / handle_high if handle_high > 0 else 1.0
-    if handle_drop > MAX_HANDLE_DROP:
-        return None
+    # ── Scoring ───────────────────────────────────────────────────────────────
+    cup_shape = calc_cup_shape(df)
+    handle_quality = calc_handle_quality(df)
+    volume_pattern = calc_volume_pattern(df)
+    breakout_strength = calc_breakout_strength(df)
 
-    # ── Volume pattern ────────────────────────────────────────────────────────
-    # Average relative volume during cup formation vs baseline
+    # Signal booleans derived from raw data (for the signals list)
+    cup_df = df.iloc[-CUP_WINDOW:]
     cup_rel_vol = (cup_df["Volume"] / cup_df["vol_ma"].replace(0, np.nan)).mean()
-    last_rel_vol = (
-        df["Volume"].iloc[-1] / df["vol_ma"].iloc[-1]
-        if df["vol_ma"].iloc[-1] > 0
-        else 0.0
-    )
+    last_vol_ma = df["vol_ma"].iloc[-1]
+    last_rel_vol = df["Volume"].iloc[-1] / last_vol_ma if last_vol_ma > 0 else 0.0
     volume_contraction = cup_rel_vol < 1.0
     breakout_vol = last_rel_vol >= BREAKOUT_VOL_RATIO
-
-    # ── Sub-scores ────────────────────────────────────────────────────────────
-    # cup_shape: how symmetric / ideal the drawdown is (0.25 = best ≈ ideal mid-range)
-    ideal_drawdown = 0.25
-    cup_shape = max(0.0, 1.0 - abs(drawdown - ideal_drawdown) / ideal_drawdown)
-
-    # handle_quality: smaller drop → higher score
-    handle_quality = max(0.0, 1.0 - handle_drop / MAX_HANDLE_DROP)
-
-    # volume_pattern: contraction during cup + expansion at breakout
-    volume_pattern = 0.0
-    if volume_contraction:
-        volume_pattern += 0.5
-    if breakout_vol:
-        volume_pattern += 0.5
-
-    # breakout_strength: relative volume on breakout day
-    breakout_strength = min(1.0, last_rel_vol / 2.0)
 
     score = (
         cup_shape * W_CUP_SHAPE

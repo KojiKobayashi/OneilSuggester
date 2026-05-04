@@ -36,6 +36,112 @@ W_RALLY_WEAKNESS = 0.3
 W_VOLUME_SPIKE = 0.3
 
 
+def is_downtrend(df: pd.DataFrame) -> bool:
+    """Return True when the latest MA25 is below MA75 (primary downtrend condition).
+
+    Args:
+        df: DataFrame with columns ``ma25`` and ``ma75``.
+    """
+    valid = df.dropna(subset=["ma25", "ma75"])
+    if valid.empty:
+        return False
+    latest = valid.iloc[-1]
+    return float(latest["ma25"]) < float(latest["ma75"])
+
+
+def has_cross_below(df: pd.DataFrame) -> bool:
+    """Return True when MA25 crossed below MA75 within the last CROSS_LOOKBACK days.
+
+    Args:
+        df: DataFrame with columns ``ma25`` and ``ma75``.
+    """
+    valid = df.dropna(subset=["ma25", "ma75"])
+    if len(valid) < CROSS_LOOKBACK + 1:
+        return False
+    recent = valid.iloc[-CROSS_LOOKBACK - 1:]
+    ma25 = recent["ma25"].values
+    ma75 = recent["ma75"].values
+    return any(
+        ma25[i - 1] >= ma75[i - 1] and ma25[i] < ma75[i]
+        for i in range(1, len(ma25))
+    )
+
+
+def is_rally_capped(df: pd.DataFrame) -> bool:
+    """Return True when at least one High in the recent window is at or below MA25 * 1.02.
+
+    Args:
+        df: DataFrame with columns ``High``, ``ma25``, and ``ma75``.
+    """
+    valid = df.dropna(subset=["ma25", "ma75"])
+    recent20 = valid.iloc[-LOWER_HIGHS_WINDOW:]
+    if recent20.empty:
+        return False
+    return bool((recent20["High"] <= recent20["ma25"] * 1.02).any())
+
+
+def has_lower_highs(df: pd.DataFrame) -> bool:
+    """Return True when the most recent High is below the earliest High in the recent window.
+
+    Args:
+        df: DataFrame with columns ``High``, ``ma25``, and ``ma75``.
+    """
+    valid = df.dropna(subset=["ma25", "ma75"])
+    recent20 = valid.iloc[-LOWER_HIGHS_WINDOW:]
+    highs = recent20["High"].values
+    return bool(len(highs) >= 2 and highs[-1] < highs[0])
+
+
+def calc_downtrend_strength(df: pd.DataFrame) -> float:
+    """Return the downtrend-strength sub-score [0, 1].
+
+    Measures the gap between MA75 and MA25 relative to MA75. A gap of 5 % or
+    more normalises to 1.0; smaller gaps scale linearly.
+
+    Args:
+        df: DataFrame with columns ``ma25`` and ``ma75``.
+    """
+    valid = df.dropna(subset=["ma25", "ma75"])
+    if valid.empty:
+        return 0.0
+    latest = valid.iloc[-1]
+    ma_gap = (latest["ma75"] - latest["ma25"]) / latest["ma75"]
+    return float(min(1.0, ma_gap / 0.05))
+
+
+def calc_rally_weakness(df: pd.DataFrame) -> float:
+    """Return the rally-weakness sub-score [0, 1].
+
+    Fraction of days in the recent ``LOWER_HIGHS_WINDOW`` window where
+    ``Close`` is at or below ``MA25``.
+
+    Args:
+        df: DataFrame with columns ``Close``, ``ma25``, ``ma75``.
+    """
+    valid = df.dropna(subset=["ma25", "ma75"])
+    recent20 = valid.iloc[-LOWER_HIGHS_WINDOW:]
+    if recent20.empty:
+        return 0.0
+    return float((recent20["Close"] <= recent20["ma25"]).mean())
+
+
+def calc_volume_spike(df: pd.DataFrame) -> float:
+    """Return the volume-spike sub-score [0, 1]: relative volume on the last day.
+
+    Relative volume of 2× (or more) gives a score of 1.0; lower values scale
+    linearly down to 0.0.
+
+    Args:
+        df: DataFrame with columns ``Volume`` and ``vol_ma``.
+    """
+    if df.empty:
+        return 0.0
+    last_vol_ma = df["vol_ma"].iloc[-1]
+    last_vol = df["Volume"].iloc[-1]
+    rel_vol = (last_vol / last_vol_ma) if last_vol_ma > 0 else 0.0
+    return float(min(1.0, rel_vol / 2.0))
+
+
 def detect(df: pd.DataFrame) -> Optional[dict]:
     """Detect a short-sell pattern in *df* and return a result dict.
 
@@ -57,45 +163,27 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
         return None
 
     # ── Condition 1: MA25 < MA75 (downtrend) ─────────────────────────────────
-    latest = valid.iloc[-1]
-    if latest["ma25"] >= latest["ma75"]:
+    if not is_downtrend(df):
         return None
 
     # ── Condition 2: MA25 crossed below recently ─────────────────────────────
-    recent = valid.iloc[-CROSS_LOOKBACK - 1 :]
-    ma25 = recent["ma25"].values
-    ma75 = recent["ma75"].values
-    has_cross_below = any(
-        ma25[i - 1] >= ma75[i - 1] and ma25[i] < ma75[i]
-        for i in range(1, len(ma25))
-    )
+    cross_below = has_cross_below(df)
 
     # ── Condition 3: Rally capped at MA25 ────────────────────────────────────
-    recent20 = valid.iloc[-LOWER_HIGHS_WINDOW:]
-    rally_cap = (recent20["High"] <= recent20["ma25"] * 1.02).any()
+    rally_cap = is_rally_capped(df)
 
     # ── Condition 4: Lower highs ──────────────────────────────────────────────
-    highs = recent20["High"].values
-    lower_highs = bool(len(highs) >= 2 and highs[-1] < highs[0])
+    lower_highs = has_lower_highs(df)
 
     # At least two of the three secondary conditions must hold
-    secondary_count = sum([has_cross_below, rally_cap, lower_highs])
+    secondary_count = sum([cross_below, rally_cap, lower_highs])
     if secondary_count < 2:
         return None
 
     # ── Sub-scores ────────────────────────────────────────────────────────────
-    # downtrend_strength: gap between MA25 and MA75 relative to MA75
-    ma_gap = (latest["ma75"] - latest["ma25"]) / latest["ma75"]
-    downtrend_strength = min(1.0, ma_gap / 0.05)  # normalise to ~5 % gap = 1.0
-
-    # rally_weakness: fraction of recent days where Close ≤ MA25
-    rally_weakness = float((recent20["Close"] <= recent20["ma25"]).mean())
-
-    # volume_spike: latest relative volume (bearish volume confirmation)
-    last_vol_ma = df["vol_ma"].iloc[-1]
-    last_vol = df["Volume"].iloc[-1]
-    rel_vol = (last_vol / last_vol_ma) if last_vol_ma > 0 else 0.0
-    volume_spike = min(1.0, rel_vol / 2.0)
+    downtrend_strength = calc_downtrend_strength(df)
+    rally_weakness = calc_rally_weakness(df)
+    volume_spike = calc_volume_spike(df)
 
     score = (
         downtrend_strength * W_DOWNTREND
@@ -104,7 +192,7 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
     )
 
     signals: list[str] = ["MA25 < MA75"]
-    if has_cross_below:
+    if cross_below:
         signals.append("MA25 crossed below MA75")
     if rally_cap:
         signals.append("rally capped at MA25")
