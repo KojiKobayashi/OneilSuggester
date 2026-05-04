@@ -36,45 +36,59 @@ W_RALLY_WEAKNESS = 0.3
 W_VOLUME_SPIKE = 0.3
 
 
-def is_downtrend(ma25_last: float, ma75_last: float) -> bool:
-    """Return True when MA25 is below MA75 (primary downtrend condition).
+def is_downtrend(df: pd.DataFrame) -> bool:
+    """Return True when the latest MA25 is below MA75 (primary downtrend condition).
 
     Args:
-        ma25_last: The most-recent MA25 value.
-        ma75_last: The most-recent MA75 value.
+        df: DataFrame with columns ``ma25`` and ``ma75``.
     """
-    return float(ma25_last) < float(ma75_last)
+    valid = df.dropna(subset=["ma25", "ma75"])
+    if valid.empty:
+        return False
+    latest = valid.iloc[-1]
+    return float(latest["ma25"]) < float(latest["ma75"])
 
 
-def has_cross_below(ma25: np.ndarray, ma75: np.ndarray) -> bool:
-    """Return True when MA25 crossed below MA75 at any point in the arrays.
+def has_cross_below(df: pd.DataFrame) -> bool:
+    """Return True when MA25 crossed below MA75 within the last CROSS_LOOKBACK days.
 
     Args:
-        ma25: Array of MA25 values (chronological order).
-        ma75: Array of MA75 values (same length as *ma25*).
+        df: DataFrame with columns ``ma25`` and ``ma75``.
     """
+    valid = df.dropna(subset=["ma25", "ma75"])
+    if len(valid) < CROSS_LOOKBACK + 1:
+        return False
+    recent = valid.iloc[-CROSS_LOOKBACK - 1:]
+    ma25 = recent["ma25"].values
+    ma75 = recent["ma75"].values
     return any(
         ma25[i - 1] >= ma75[i - 1] and ma25[i] < ma75[i]
         for i in range(1, len(ma25))
     )
 
 
-def is_rally_capped(highs: pd.Series, ma25: pd.Series) -> bool:
-    """Return True when at least one high is at or below MA25 * 1.02.
+def is_rally_capped(df: pd.DataFrame) -> bool:
+    """Return True when at least one High in the recent window is at or below MA25 * 1.02.
 
     Args:
-        highs: Series of daily High prices.
-        ma25: Series of MA25 values aligned with *highs*.
+        df: DataFrame with columns ``High``, ``ma25``, and ``ma75``.
     """
-    return bool((highs <= ma25 * 1.02).any())
+    valid = df.dropna(subset=["ma25", "ma75"])
+    recent20 = valid.iloc[-LOWER_HIGHS_WINDOW:]
+    if recent20.empty:
+        return False
+    return bool((recent20["High"] <= recent20["ma25"] * 1.02).any())
 
 
-def has_lower_highs(highs: np.ndarray) -> bool:
-    """Return True when the most recent high is below the earliest high.
+def has_lower_highs(df: pd.DataFrame) -> bool:
+    """Return True when the most recent High is below the earliest High in the recent window.
 
     Args:
-        highs: Array of daily High prices (chronological order).
+        df: DataFrame with columns ``High``, ``ma25``, and ``ma75``.
     """
+    valid = df.dropna(subset=["ma25", "ma75"])
+    recent20 = valid.iloc[-LOWER_HIGHS_WINDOW:]
+    highs = recent20["High"].values
     return bool(len(highs) >= 2 and highs[-1] < highs[0])
 
 
@@ -99,20 +113,17 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
         return None
 
     # ── Condition 1: MA25 < MA75 (downtrend) ─────────────────────────────────
-    latest = valid.iloc[-1]
-    if not is_downtrend(latest["ma25"], latest["ma75"]):
+    if not is_downtrend(df):
         return None
 
     # ── Condition 2: MA25 crossed below recently ─────────────────────────────
-    recent = valid.iloc[-CROSS_LOOKBACK - 1 :]
-    cross_below = has_cross_below(recent["ma25"].values, recent["ma75"].values)
+    cross_below = has_cross_below(df)
 
     # ── Condition 3: Rally capped at MA25 ────────────────────────────────────
-    recent20 = valid.iloc[-LOWER_HIGHS_WINDOW:]
-    rally_cap = is_rally_capped(recent20["High"], recent20["ma25"])
+    rally_cap = is_rally_capped(df)
 
     # ── Condition 4: Lower highs ──────────────────────────────────────────────
-    lower_highs = has_lower_highs(recent20["High"].values)
+    lower_highs = has_lower_highs(df)
 
     # At least two of the three secondary conditions must hold
     secondary_count = sum([cross_below, rally_cap, lower_highs])
@@ -120,6 +131,9 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
         return None
 
     # ── Sub-scores ────────────────────────────────────────────────────────────
+    latest = valid.iloc[-1]
+    recent20 = valid.iloc[-LOWER_HIGHS_WINDOW:]
+
     # downtrend_strength: gap between MA25 and MA75 relative to MA75
     ma_gap = (latest["ma75"] - latest["ma25"]) / latest["ma75"]
     downtrend_strength = min(1.0, ma_gap / 0.05)  # normalise to ~5 % gap = 1.0

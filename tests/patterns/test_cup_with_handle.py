@@ -6,6 +6,7 @@ import pytest
 
 from src.patterns.cup_with_handle import (
     CUP_WINDOW,
+    HANDLE_WINDOW,
     MAX_DRAWDOWN,
     MAX_HANDLE_DROP,
     MIN_BASE_DAYS,
@@ -17,88 +18,27 @@ from src.patterns.cup_with_handle import (
 )
 
 
-# ── Condition function tests ───────────────────────────────────────────────────
-
-class TestIsValidDrawdown:
-    def test_valid_lower_bound(self):
-        assert is_valid_drawdown(MIN_DRAWDOWN) is True
-
-    def test_valid_upper_bound(self):
-        assert is_valid_drawdown(MAX_DRAWDOWN) is True
-
-    def test_valid_midpoint(self):
-        assert is_valid_drawdown(0.20) is True
-
-    def test_too_shallow(self):
-        assert is_valid_drawdown(MIN_DRAWDOWN - 0.01) is False
-
-    def test_too_deep(self):
-        assert is_valid_drawdown(MAX_DRAWDOWN + 0.01) is False
-
-    def test_zero_drawdown_invalid(self):
-        assert is_valid_drawdown(0.0) is False
-
-
-class TestHasSufficientBase:
-    def _make_cup_df(self, closes):
-        return pd.DataFrame({"Close": closes})
-
-    def test_sufficient_base(self):
-        bottom = 80.0
-        # All prices within 10 % of bottom → more than MIN_BASE_DAYS days
-        closes = [bottom * 1.05] * (MIN_BASE_DAYS + 5)
-        df = self._make_cup_df(closes)
-        assert has_sufficient_base(df, bottom) is True
-
-    def test_insufficient_base(self):
-        bottom = 80.0
-        # Only a few prices near bottom, rest are far above
-        closes = [bottom * 1.05] * 5 + [bottom * 2.0] * 100
-        df = self._make_cup_df(closes)
-        assert has_sufficient_base(df, bottom) is False
-
-    def test_boundary_exactly_min_base_days(self):
-        bottom = 100.0
-        closes = [bottom * 1.05] * MIN_BASE_DAYS
-        df = self._make_cup_df(closes)
-        assert has_sufficient_base(df, bottom) is True
-
-
-class TestIsHandleValid:
-    def test_valid_small_drop(self):
-        assert is_handle_valid(0.05) is True
-
-    def test_valid_at_maximum(self):
-        assert is_handle_valid(MAX_HANDLE_DROP) is True
-
-    def test_invalid_exceeds_maximum(self):
-        assert is_handle_valid(MAX_HANDLE_DROP + 0.01) is False
-
-    def test_zero_drop_valid(self):
-        assert is_handle_valid(0.0) is True
-
-
-# ── detect() integration tests ─────────────────────────────────────────────────
+# ── Shared synthetic-data builder ──────────────────────────────────────────────
 
 def _make_cup_df(n: int = 140) -> pd.DataFrame:
     """Build a synthetic cup-with-handle DataFrame.
 
     Structure (within the last CUP_WINDOW=120 rows):
-    - Left peak: price rises to 120 in the first 30 bars.
-    - Cup bottom: price falls to ~90 (25 % drawdown) over the next 60 bars.
-    - Recovery: price rises back to ~115 in the remaining bars.
-    - Handle: tight consolidation in the last 20 bars.
+    - Left peak: price rises to 120 in the first 20 bars.
+    - Cup descent: price falls to ~90 (~25 % drawdown) over 40 bars.
+    - Base: wide base near the bottom for 20 bars.
+    - Recovery: price rises back to ~115 over 20 bars.
+    - Handle: tight consolidation in the last 20 bars (< 12 % drop).
     """
     idx = pd.date_range("2022-01-01", periods=n, freq="B")
 
-    # Build close prices with a clear cup shape in the last 120 bars
     pre = np.full(n - CUP_WINDOW, 100.0)  # pre-cup baseline
 
     left_peak = np.linspace(100.0, 120.0, 20)
     descent = np.linspace(120.0, 90.0, 40)
-    base = np.full(20, 91.0)             # wide base near bottom
+    base = np.full(20, 91.0)
     recovery = np.linspace(91.0, 115.0, 20)
-    handle = np.linspace(115.0, 112.0, 20)  # tight handle (< 12 % drop)
+    handle = np.linspace(115.0, 112.0, 20)  # tight handle
 
     closes = np.concatenate([pre, left_peak, descent, base, recovery, handle])
     assert len(closes) == n, f"Expected {n} rows, got {len(closes)}"
@@ -107,9 +47,7 @@ def _make_cup_df(n: int = 140) -> pd.DataFrame:
     lows = closes - 1.0
     volume = np.full(n, 500.0)
     vol_ma = np.full(n, 600.0)  # cup_rel_vol < 1.0 → volume contraction
-    # Last bar: volume spike for breakout
-    volume[-1] = 700.0
-    vol_ma[-1] = 600.0  # rel_vol = 700/600 ≈ 1.17 ≥ 1.0
+    volume[-1] = 700.0  # breakout volume spike
 
     df = pd.DataFrame(
         {
@@ -127,10 +65,73 @@ def _make_cup_df(n: int = 140) -> pd.DataFrame:
     return df
 
 
+# ── Condition function tests ───────────────────────────────────────────────────
+
+class TestIsValidDrawdown:
+    def test_valid_drawdown_detected(self):
+        df = _make_cup_df()
+        assert is_valid_drawdown(df) is True
+
+    def test_too_shallow_drawdown(self):
+        df = _make_cup_df()
+        # Flatten all close prices → ~0 % drawdown
+        df["Close"] = 100.0
+        assert is_valid_drawdown(df) is False
+
+    def test_too_deep_drawdown(self):
+        df = _make_cup_df()
+        # Make the cup bottom extremely low → > 35 % drawdown
+        cup_start = len(df) - CUP_WINDOW
+        df.iloc[cup_start + 20 : cup_start + 80, df.columns.get_loc("Close")] = 50.0
+        assert is_valid_drawdown(df) is False
+
+    def test_insufficient_rows_returns_false(self):
+        df = _make_cup_df()
+        assert is_valid_drawdown(df.iloc[:CUP_WINDOW - 1]) is False
+
+
+class TestHasSufficientBase:
+    def test_sufficient_base_detected(self):
+        df = _make_cup_df()
+        assert has_sufficient_base(df) is True
+
+    def test_insufficient_base(self):
+        df = _make_cup_df()
+        # Replace the wide base with a sharp V (only 1 day near the bottom)
+        cup_start = len(df) - CUP_WINDOW
+        closes = df["Close"].values.copy()
+        closes[cup_start:] = np.linspace(120.0, 60.0, CUP_WINDOW)
+        df["Close"] = closes
+        assert has_sufficient_base(df) is False
+
+    def test_insufficient_rows_returns_false(self):
+        df = _make_cup_df()
+        assert has_sufficient_base(df.iloc[:CUP_WINDOW - 1]) is False
+
+
+class TestIsHandleValid:
+    def test_valid_handle_detected(self):
+        df = _make_cup_df()
+        assert is_handle_valid(df) is True
+
+    def test_invalid_handle_drop_too_large(self):
+        df = _make_cup_df()
+        # Widen the handle range to exceed MAX_HANDLE_DROP (12 %)
+        df.iloc[-HANDLE_WINDOW:, df.columns.get_loc("High")] = 120.0
+        df.iloc[-HANDLE_WINDOW:, df.columns.get_loc("Low")] = 100.0
+        # handle_drop = (120 - 100) / 120 ≈ 0.167 > 0.12
+        assert is_handle_valid(df) is False
+
+    def test_insufficient_rows_returns_false(self):
+        df = _make_cup_df()
+        assert is_handle_valid(df.iloc[:HANDLE_WINDOW - 1]) is False
+
+
+# ── detect() integration tests ─────────────────────────────────────────────────
+
 class TestDetectCupWithHandle:
     def test_returns_none_for_insufficient_rows(self):
         df = _make_cup_df(n=140)
-        # Slice to fewer than CUP_WINDOW rows
         assert detect(df.iloc[:CUP_WINDOW - 1]) is None
 
     def test_detects_cup_pattern(self):
@@ -155,7 +156,6 @@ class TestDetectCupWithHandle:
 
     def test_returns_none_when_drawdown_too_shallow(self):
         df = _make_cup_df(n=140)
-        # Force all close prices flat → drawdown near 0
         df["Close"] = 100.0
         df["High"] = 101.0
         df["Low"] = 99.0
@@ -163,8 +163,7 @@ class TestDetectCupWithHandle:
 
     def test_returns_none_when_handle_drop_too_large(self):
         df = _make_cup_df(n=140)
-        # Widen the handle range to exceed MAX_HANDLE_DROP
-        df.iloc[-20:, df.columns.get_loc("High")] = 120.0
-        df.iloc[-20:, df.columns.get_loc("Low")] = 100.0
-        # handle_drop = (120 - 100) / 120 ≈ 0.167 > 0.12
+        df.iloc[-HANDLE_WINDOW:, df.columns.get_loc("High")] = 120.0
+        df.iloc[-HANDLE_WINDOW:, df.columns.get_loc("Low")] = 100.0
         assert detect(df) is None
+

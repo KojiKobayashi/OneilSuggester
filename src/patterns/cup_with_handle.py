@@ -37,6 +37,7 @@ MIN_BASE_DAYS = 20        # minimum days forming the base of the cup
 HANDLE_WINDOW = 20        # look-back window for handle detection
 MAX_HANDLE_DROP = 0.12    # maximum handle decline (12 %)
 BREAKOUT_VOL_RATIO = 1.0  # relative-volume threshold at breakout
+BASE_TOLERANCE = 1.10     # price must be within 10 % of the bottom to count as base
 
 # ── Score weights ──────────────────────────────────────────────────────────────
 W_CUP_SHAPE = 0.3
@@ -45,34 +46,58 @@ W_VOLUME_PATTERN = 0.2
 W_BREAKOUT_STRENGTH = 0.3
 
 
-def is_valid_drawdown(drawdown: float) -> bool:
-    """Return True when *drawdown* is within the valid cup depth range.
+def is_valid_drawdown(df: pd.DataFrame) -> bool:
+    """Return True when the cup drawdown is within the valid range (10%–35%).
 
     Args:
-        drawdown: Fractional drawdown from the left peak to the cup bottom
-            (e.g. 0.20 for a 20 % decline).
+        df: DataFrame with at least ``CUP_WINDOW`` rows and a ``Close`` column.
     """
-    return MIN_DRAWDOWN <= drawdown <= MAX_DRAWDOWN
+    if len(df) < CUP_WINDOW:
+        return False
+    cup_df = df.iloc[-CUP_WINDOW:]
+    left_peak_idx = cup_df["Close"].iloc[:CUP_WINDOW // 2].idxmax()
+    left_peak_price = cup_df.loc[left_peak_idx, "Close"]
+    left_loc = cup_df.index.get_loc(left_peak_idx)
+    right_portion = cup_df.iloc[left_loc:]
+    if len(right_portion) < MIN_BASE_DAYS:
+        return False
+    bottom_price = right_portion["Close"].min()
+    drawdown = (left_peak_price - bottom_price) / left_peak_price
+    return bool(MIN_DRAWDOWN <= drawdown <= MAX_DRAWDOWN)
 
 
-def has_sufficient_base(cup_df: pd.DataFrame, bottom_price: float) -> bool:
+def has_sufficient_base(df: pd.DataFrame) -> bool:
     """Return True when enough trading days are near the cup bottom.
 
     Args:
-        cup_df: DataFrame slice covering the cup window.
-        bottom_price: Price at the cup bottom.
+        df: DataFrame with at least ``CUP_WINDOW`` rows and a ``Close`` column.
     """
-    base_days = int((cup_df["Close"] <= bottom_price * 1.10).sum())
-    return base_days >= MIN_BASE_DAYS
+    if len(df) < CUP_WINDOW:
+        return False
+    cup_df = df.iloc[-CUP_WINDOW:]
+    left_peak_idx = cup_df["Close"].iloc[:CUP_WINDOW // 2].idxmax()
+    left_loc = cup_df.index.get_loc(left_peak_idx)
+    right_portion = cup_df.iloc[left_loc:]
+    if len(right_portion) < MIN_BASE_DAYS:
+        return False
+    bottom_price = right_portion["Close"].min()
+    base_days = int((cup_df["Close"] <= bottom_price * BASE_TOLERANCE).sum())
+    return bool(base_days >= MIN_BASE_DAYS)
 
 
-def is_handle_valid(handle_drop: float) -> bool:
-    """Return True when the handle decline is within the allowed maximum.
+def is_handle_valid(df: pd.DataFrame) -> bool:
+    """Return True when the handle decline is within the allowed maximum (12%).
 
     Args:
-        handle_drop: Fractional decline from the handle high to the handle low.
+        df: DataFrame with at least ``HANDLE_WINDOW`` rows and ``High``/``Low`` columns.
     """
-    return handle_drop <= MAX_HANDLE_DROP
+    if len(df) < HANDLE_WINDOW:
+        return False
+    handle_df = df.iloc[-HANDLE_WINDOW:]
+    handle_high = handle_df["High"].max()
+    handle_low = handle_df["Low"].min()
+    handle_drop = (handle_high - handle_low) / handle_high if handle_high > 0 else 1.0
+    return bool(handle_drop <= MAX_HANDLE_DROP)
 
 
 def detect(df: pd.DataFrame) -> Optional[dict]:
@@ -107,11 +132,11 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
 
     # ── Drawdown check ────────────────────────────────────────────────────────
     drawdown = (left_peak_price - bottom_price) / left_peak_price
-    if not is_valid_drawdown(drawdown):
+    if not is_valid_drawdown(df):
         return None
 
     # ── Base width: days within 10 % of the bottom across the full cup ───────
-    if not has_sufficient_base(cup_df, bottom_price):
+    if not has_sufficient_base(df):
         return None
 
     # ── Handle detection ─────────────────────────────────────────────────────
@@ -119,7 +144,7 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
     handle_high = handle_df["High"].max()
     handle_low = handle_df["Low"].min()
     handle_drop = (handle_high - handle_low) / handle_high if handle_high > 0 else 1.0
-    if not is_handle_valid(handle_drop):
+    if not is_handle_valid(df):
         return None
 
     # ── Volume pattern ────────────────────────────────────────────────────────

@@ -5,6 +5,8 @@ import pandas as pd
 import pytest
 
 from src.patterns.short_sell import (
+    CROSS_LOOKBACK,
+    LOWER_HIGHS_WINDOW,
     detect,
     has_cross_below,
     has_lower_highs,
@@ -13,91 +15,123 @@ from src.patterns.short_sell import (
 )
 
 
+# ── Helpers ────────────────────────────────────────────────────────────────────
+
+def _make_df(
+    n: int = 30,
+    ma25: float = 95.0,
+    ma75: float = 100.0,
+    high: float = 98.0,
+) -> pd.DataFrame:
+    """Return a minimal DataFrame suitable for condition-function tests."""
+    idx = pd.date_range("2024-01-01", periods=n, freq="B")
+    return pd.DataFrame(
+        {
+            "Close": np.full(n, 95.0),
+            "High": np.full(n, high),
+            "Low": np.full(n, 93.0),
+            "Open": np.full(n, 95.0),
+            "Volume": np.full(n, 1000.0),
+            "vol_ma": np.full(n, 1000.0),
+            "ma25": np.full(n, ma25),
+            "ma75": np.full(n, ma75),
+        },
+        index=idx,
+    )
+
+
 # ── Condition function tests ───────────────────────────────────────────────────
 
 class TestIsDowntrend:
     def test_returns_true_when_ma25_below_ma75(self):
-        assert is_downtrend(90.0, 100.0) is True
+        df = _make_df(ma25=90.0, ma75=100.0)
+        assert is_downtrend(df) is True
 
     def test_returns_false_when_ma25_equals_ma75(self):
-        assert is_downtrend(100.0, 100.0) is False
+        df = _make_df(ma25=100.0, ma75=100.0)
+        assert is_downtrend(df) is False
 
     def test_returns_false_when_ma25_above_ma75(self):
-        assert is_downtrend(110.0, 100.0) is False
+        df = _make_df(ma25=110.0, ma75=100.0)
+        assert is_downtrend(df) is False
+
+    def test_empty_valid_rows_returns_false(self):
+        df = _make_df()
+        df["ma25"] = np.nan
+        df["ma75"] = np.nan
+        assert is_downtrend(df) is False
 
     def test_small_difference(self):
-        assert is_downtrend(99.99, 100.0) is True
-        assert is_downtrend(100.01, 100.0) is False
+        assert is_downtrend(_make_df(ma25=99.99, ma75=100.0)) is True
+        assert is_downtrend(_make_df(ma25=100.01, ma75=100.0)) is False
 
 
 class TestHasCrossBelow:
     def test_detects_cross(self):
-        # ma25 was above ma75, then crossed below
-        ma25 = np.array([105.0, 100.0, 95.0])
-        ma75 = np.array([100.0, 100.0, 100.0])
-        assert has_cross_below(ma25, ma75) is True
+        # Build a df where ma25 crosses below ma75 within the lookback window
+        df = _make_df(n=CROSS_LOOKBACK + 5, ma25=90.0, ma75=100.0)
+        # Day 0 of the lookback window: ma25 above ma75
+        df.iloc[-(CROSS_LOOKBACK + 1), df.columns.get_loc("ma25")] = 101.0
+        # Day 1: ma25 below ma75 → cross
+        df.iloc[-CROSS_LOOKBACK, df.columns.get_loc("ma25")] = 99.0
+        assert has_cross_below(df) is True
 
     def test_no_cross_always_below(self):
-        ma25 = np.array([90.0, 89.0, 88.0])
-        ma75 = np.array([100.0, 100.0, 100.0])
-        assert has_cross_below(ma25, ma75) is False
+        df = _make_df(n=CROSS_LOOKBACK + 5, ma25=90.0, ma75=100.0)
+        assert has_cross_below(df) is False
 
     def test_no_cross_always_above(self):
-        ma25 = np.array([110.0, 109.0, 108.0])
-        ma75 = np.array([100.0, 100.0, 100.0])
-        assert has_cross_below(ma25, ma75) is False
+        df = _make_df(n=CROSS_LOOKBACK + 5, ma25=110.0, ma75=100.0)
+        assert has_cross_below(df) is False
 
-    def test_single_element_no_cross(self):
-        assert has_cross_below(np.array([100.0]), np.array([100.0])) is False
-
-    def test_cross_at_first_transition(self):
-        ma25 = np.array([101.0, 99.0])
-        ma75 = np.array([100.0, 100.0])
-        assert has_cross_below(ma25, ma75) is True
+    def test_insufficient_rows_returns_false(self):
+        df = _make_df(n=2, ma25=90.0, ma75=100.0)
+        assert has_cross_below(df) is False
 
 
 class TestIsRallyCapped:
     def test_capped_when_high_below_ma25(self):
-        highs = pd.Series([95.0, 96.0])
-        ma25 = pd.Series([100.0, 100.0])
-        assert is_rally_capped(highs, ma25) is True
+        # high=95, ma25=100 → 95 ≤ 100*1.02=102 → capped
+        df = _make_df(n=LOWER_HIGHS_WINDOW + 5, ma25=100.0, ma75=105.0, high=95.0)
+        assert is_rally_capped(df) is True
 
     def test_capped_within_2_pct_tolerance(self):
-        highs = pd.Series([101.5])
-        ma25 = pd.Series([100.0])
-        # 101.5 <= 100.0 * 1.02 = 102.0 → capped
-        assert is_rally_capped(highs, ma25) is True
+        # high=101.5, ma25=100 → 101.5 ≤ 102.0 → capped
+        df = _make_df(n=LOWER_HIGHS_WINDOW + 5, ma25=100.0, ma75=105.0, high=101.5)
+        assert is_rally_capped(df) is True
 
     def test_not_capped_when_high_exceeds_threshold(self):
-        highs = pd.Series([103.0])
-        ma25 = pd.Series([100.0])
-        # 103.0 > 100.0 * 1.02 = 102.0 → not capped
-        assert is_rally_capped(highs, ma25) is False
+        # high=103, ma25=100 → 103 > 102 → not capped
+        df = _make_df(n=LOWER_HIGHS_WINDOW + 5, ma25=100.0, ma75=105.0, high=103.0)
+        assert is_rally_capped(df) is False
 
-    def test_at_least_one_capped_returns_true(self):
-        highs = pd.Series([103.0, 99.0, 110.0])
-        ma25 = pd.Series([100.0, 100.0, 100.0])
-        assert is_rally_capped(highs, ma25) is True
+    def test_empty_returns_false(self):
+        df = _make_df(n=5, ma25=100.0, ma75=100.0)
+        df["ma25"] = np.nan
+        df["ma75"] = np.nan
+        assert is_rally_capped(df) is False
 
 
 class TestHasLowerHighs:
     def test_lower_high_detected(self):
-        highs = np.array([120.0, 115.0, 110.0])
-        assert has_lower_highs(highs) is True
+        df = _make_df(n=LOWER_HIGHS_WINDOW + 5, ma25=95.0, ma75=100.0)
+        highs = np.linspace(120.0, 90.0, len(df))  # declining
+        df["High"] = highs
+        assert has_lower_highs(df) is True
 
     def test_no_lower_high_rising(self):
-        highs = np.array([100.0, 105.0, 110.0])
-        assert has_lower_highs(highs) is False
+        df = _make_df(n=LOWER_HIGHS_WINDOW + 5, ma25=95.0, ma75=100.0)
+        highs = np.linspace(90.0, 120.0, len(df))  # rising
+        df["High"] = highs
+        assert has_lower_highs(df) is False
 
     def test_equal_highs_no_lower_high(self):
-        highs = np.array([100.0, 100.0])
-        assert has_lower_highs(highs) is False
+        df = _make_df(n=LOWER_HIGHS_WINDOW + 5, ma25=95.0, ma75=100.0, high=100.0)
+        assert has_lower_highs(df) is False
 
-    def test_single_element_returns_false(self):
-        assert has_lower_highs(np.array([100.0])) is False
-
-    def test_empty_array_returns_false(self):
-        assert has_lower_highs(np.array([])) is False
+    def test_insufficient_valid_rows_returns_false(self):
+        df = _make_df(n=1, ma25=95.0, ma75=100.0)
+        assert has_lower_highs(df) is False
 
 
 # ── detect() integration tests ─────────────────────────────────────────────────
@@ -164,12 +198,9 @@ class TestDetect:
         df = _make_short_df(n=100)
         # Force highs upward so lower_highs is False AND rally is not capped
         df["High"] = np.linspace(90.0, 110.0, len(df))  # rising highs
-        df["ma25"] = 80.0  # MA25 well below highs → rally not capped
-        # Remove cross-below signal
-        df["ma25"] = 80.0
-        result = detect(df)
-        # With ma25 < ma75 already (80 < 100) but no secondary conditions:
+        df["ma25"] = 80.0  # MA25 well below highs so rally is not capped
         # lower_highs=False (rising), rally_cap=False (highs >> ma25*1.02),
         # cross_below may or may not fire — either way secondary_count < 2
-        # so result should be None
+        result = detect(df)
         assert result is None
+
