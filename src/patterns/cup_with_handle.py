@@ -115,37 +115,29 @@ def detect(df: pd.DataFrame) -> Optional[dict]:
     if len(df) < CUP_WINDOW:
         return None
 
-    cup_df = df.iloc[-CUP_WINDOW:].copy()
-
-    # ── Identify left peak ────────────────────────────────────────────────────
-    left_peak_idx = cup_df["Close"].iloc[: CUP_WINDOW // 2].idxmax()
-    left_peak_price = cup_df.loc[left_peak_idx, "Close"]
-    left_loc = cup_df.index.get_loc(left_peak_idx)
-
-    # The bottom must occur *after* the left peak
-    right_portion = cup_df.iloc[left_loc:]
-    if len(right_portion) < MIN_BASE_DAYS:
-        return None
-
-    bottom_idx = right_portion["Close"].idxmin()
-    bottom_price = right_portion.loc[bottom_idx, "Close"]
-
-    # ── Drawdown check ────────────────────────────────────────────────────────
-    drawdown = (left_peak_price - bottom_price) / left_peak_price
+    # ── Condition checks ──────────────────────────────────────────────────────
     if not is_valid_drawdown(df):
         return None
 
-    # ── Base width: days within 10 % of the bottom across the full cup ───────
     if not has_sufficient_base(df):
         return None
 
-    # ── Handle detection ─────────────────────────────────────────────────────
+    if not is_handle_valid(df):
+        return None
+
+    # ── Derive values needed for scoring ──────────────────────────────────────
+    cup_df = df.iloc[-CUP_WINDOW:].copy()
+
+    left_peak_idx = cup_df["Close"].iloc[:CUP_WINDOW // 2].idxmax()
+    left_peak_price = cup_df.loc[left_peak_idx, "Close"]
+    left_loc = cup_df.index.get_loc(left_peak_idx)
+    bottom_price = cup_df.iloc[left_loc:]["Close"].min()
+    drawdown = (left_peak_price - bottom_price) / left_peak_price
+
     handle_df = df.iloc[-HANDLE_WINDOW:]
     handle_high = handle_df["High"].max()
     handle_low = handle_df["Low"].min()
     handle_drop = (handle_high - handle_low) / handle_high if handle_high > 0 else 1.0
-    if not is_handle_valid(df):
-        return None
 
     # ── Volume pattern ────────────────────────────────────────────────────────
     # Average relative volume during cup formation vs baseline
