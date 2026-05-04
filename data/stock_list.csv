@@ -174,7 +174,7 @@ code,name
 8802.T,Mitsubishi Estate
 8804.T,Tokyo Tatemono
 8803.T,Heiwa Real Estate
-3234.T,森トラスト
+3234.T,Mori Trust
 5401.T,Nippon Steel
 5713.T,Sumitomo Metal Mining
 5411.T,JFE Holdings
@@ -256,7 +256,7 @@ code,name
 4755.T,Rakuten Group
 6098.T,Recruit Holdings
 2413.T,M3
-4816.T,東映アニメーション
+4816.T,Toei Animation
 4839.T,WOWOW
 2432.T,DeNA
 3861.T,Oji Holdings
@@ -272,7 +272,7 @@ code,name
 1824.T,Maeda Corporation
 1826.T,Sato Kogyo
 1944.T,Kinden Corporation
-1945.T,Tokyo Energy & Systems
+1945.T,Toyo Construction
 1961.T,Sanki Engineering
 1963.T,JGC Holdings
 1964.T,Chuden Engineering Consultants
@@ -280,16 +280,12 @@ code,name
 1966.T,Takasago Thermal Engineering
 1967.T,IHI Plant Services
 1968.T,Taihei Dengyo Kaisha
-1969.T,Takasago Thermal Engineering
 1975.T,JESCO Holdings
 1976.T,Kodensha
 1979.T,Ando Hazama
 1980.T,DAI-DAN
 1982.T,Nichiei Intec
 1983.T,Toshiba Plant Systems & Services
-1984.T,Takasago Thermal Engineering
-1985.T,Tokyo Energy & Systems
 1987.T,Sumitomo Electric Wiring Systems
 1990.T,Watanabe Construction
 1992.T,Kanamoto
-1994.T,Takasago Thermal Engineering
