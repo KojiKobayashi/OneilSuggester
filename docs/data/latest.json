@@ -1,77 +1,11 @@
 {
-  "generated_at": "2026-06-02T22:00:38Z",
+  "generated_at": "2026-06-03T22:01:57Z",
   "items": [
-    {
-      "code": "1925.T",
-      "name": "Daiwa House Industry",
-      "type": "short",
-      "score": 0.9323,
-      "signals": [
-        "MA25 < MA75",
-        "rally capped at MA25",
-        "lower highs"
-      ]
-    },
     {
       "code": "9021.T",
       "name": "West Japan Railway",
       "type": "short",
-      "score": 0.9238,
-      "signals": [
-        "MA25 < MA75",
-        "rally capped at MA25",
-        "lower highs"
-      ]
-    },
-    {
-      "code": "3086.T",
-      "name": "J. Front Retailing",
-      "type": "short",
-      "score": 0.9194,
-      "signals": [
-        "MA25 < MA75",
-        "rally capped at MA25",
-        "lower highs"
-      ]
-    },
-    {
-      "code": "7011.T",
-      "name": "Mitsubishi Heavy Industries",
-      "type": "short",
-      "score": 0.8898,
-      "signals": [
-        "MA25 < MA75",
-        "rally capped at MA25",
-        "lower highs"
-      ]
-    },
-    {
-      "code": "3382.T",
-      "name": "Seven & i Holdings",
-      "type": "short",
-      "score": 0.8887,
-      "signals": [
-        "MA25 < MA75",
-        "rally capped at MA25",
-        "lower highs"
-      ]
-    },
-    {
-      "code": "5401.T",
-      "name": "Nippon Steel",
-      "type": "short",
-      "score": 0.8798,
-      "signals": [
-        "MA25 < MA75",
-        "rally capped at MA25",
-        "lower highs"
-      ]
-    },
-    {
-      "code": "4523.T",
-      "name": "Eisai",
-      "type": "short",
-      "score": 0.8771,
+      "score": 0.8991,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
@@ -82,7 +16,7 @@
       "code": "4502.T",
       "name": "Takeda Pharmaceutical",
       "type": "short",
-      "score": 0.8731,
+      "score": 0.8631,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
@@ -90,10 +24,10 @@
       ]
     },
     {
-      "code": "7203.T",
-      "name": "Toyota Motor",
+      "code": "4523.T",
+      "name": "Eisai",
       "type": "short",
-      "score": 0.8666,
+      "score": 0.8608,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
@@ -101,10 +35,10 @@
       ]
     },
     {
-      "code": "8267.T",
-      "name": "AEON",
+      "code": "7011.T",
+      "name": "Mitsubishi Heavy Industries",
       "type": "short",
-      "score": 0.8525,
+      "score": 0.8596,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
@@ -112,10 +46,10 @@
       ]
     },
     {
-      "code": "2282.T",
-      "name": "NH Foods",
+      "code": "1925.T",
+      "name": "Daiwa House Industry",
       "type": "short",
-      "score": 0.8426,
+      "score": 0.8501,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
@@ -126,29 +60,7 @@
       "code": "9022.T",
       "name": "Central Japan Railway",
       "type": "short",
-      "score": 0.84,
-      "signals": [
-        "MA25 < MA75",
-        "rally capped at MA25",
-        "lower highs"
-      ]
-    },
-    {
-      "code": "3003.T",
-      "name": "Hulic",
-      "type": "short",
-      "score": 0.8323,
-      "signals": [
-        "MA25 < MA75",
-        "rally capped at MA25",
-        "lower highs"
-      ]
-    },
-    {
-      "code": "4519.T",
-      "name": "Chugai Pharmaceutical",
-      "type": "short",
-      "score": 0.8274,
+      "score": 0.8448,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
@@ -159,7 +71,7 @@
       "code": "3659.T",
       "name": "Nexon",
       "type": "short",
-      "score": 0.8217,
+      "score": 0.8412,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
@@ -167,10 +79,10 @@
       ]
     },
     {
-      "code": "3289.T",
-      "name": "Tokyu Fudosan Holdings",
+      "code": "4519.T",
+      "name": "Chugai Pharmaceutical",
       "type": "short",
-      "score": 0.8031,
+      "score": 0.8376,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
@@ -178,10 +90,10 @@
       ]
     },
     {
-      "code": "3861.T",
-      "name": "Oji Holdings",
+      "code": "3086.T",
+      "name": "J. Front Retailing",
       "type": "short",
-      "score": 0.802,
+      "score": 0.8243,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
@@ -189,10 +101,65 @@
       ]
     },
     {
-      "code": "1928.T",
-      "name": "Sekisui House",
+      "code": "2282.T",
+      "name": "NH Foods",
       "type": "short",
-      "score": 0.8016,
+      "score": 0.8199,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "7203.T",
+      "name": "Toyota Motor",
+      "type": "short",
+      "score": 0.8172,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "8267.T",
+      "name": "AEON",
+      "type": "short",
+      "score": 0.8139,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "3003.T",
+      "name": "Hulic",
+      "type": "short",
+      "score": 0.8082,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4661.T",
+      "name": "Oriental Land",
+      "type": "short",
+      "score": 0.7993,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "5401.T",
+      "name": "Nippon Steel",
+      "type": "short",
+      "score": 0.7992,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
@@ -203,7 +170,7 @@
       "code": "7974.T",
       "name": "Nintendo",
       "type": "short",
-      "score": 0.8006,
+      "score": 0.779,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
@@ -211,10 +178,43 @@
       ]
     },
     {
-      "code": "2871.T",
-      "name": "Nichirei",
+      "code": "3861.T",
+      "name": "Oji Holdings",
       "type": "short",
-      "score": 0.7776,
+      "score": 0.7765,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "1928.T",
+      "name": "Sekisui House",
+      "type": "short",
+      "score": 0.7693,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "3382.T",
+      "name": "Seven & i Holdings",
+      "type": "short",
+      "score": 0.764,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "6305.T",
+      "name": "Hitachi Construction Machinery",
+      "type": "short",
+      "score": 0.7516,
       "signals": [
         "MA25 < MA75",
         "rally capped at MA25",
