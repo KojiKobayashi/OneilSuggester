@@ -34,3 +34,24 @@ def test_parse_jpx_excel_keeps_domestic_equity_segments(monkeypatch):
 
     assert result["code"].tolist() == ["1301.T", "9999.T", "1234.T"]
     assert result["name"].tolist() == ["Prime", "Standard", "Growth"]
+
+
+def test_parse_jpx_excel_normalizes_jpx_code_formats(monkeypatch):
+    sample = pd.DataFrame(
+        {
+            "コード": ["46610", "7203.0", "1301", "ABCD0"],
+            "銘柄名": ["Oisix", "Toyota", "Kyokuyo", "Invalid"],
+            "市場・商品区分": [
+                "プライム（内国株式）",
+                "プライム（内国株式）",
+                "スタンダード（内国株式）",
+                "プライム（内国株式）",
+            ],
+        }
+    )
+    monkeypatch.setattr(pd, "read_excel", lambda *args, **kwargs: sample)
+
+    result = parse_jpx_excel(b"dummy")
+
+    assert result["code"].tolist() == ["4661.T", "7203.T", "1301.T"]
+    assert result["name"].tolist() == ["Oisix", "Toyota", "Kyokuyo"]

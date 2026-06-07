@@ -91,6 +91,14 @@ def parse_jpx_excel(data: bytes) -> pd.DataFrame:
     domestic = df[df["market"].isin(TARGET_MARKET_SEGMENTS)].copy()
     logger.info("Domestic equity stocks: %d", len(domestic))
 
+    # JPX code formatting can vary by file version:
+    # - 4-digit string: 4661
+    # - 5-digit with trailing 0: 46610
+    # - float-like text: 4661.0
+    # Normalize to 4-digit code before building Yahoo ticker.
+    domestic["code"] = domestic["code"].str.replace(r"\.0$", "", regex=True)
+    domestic["code"] = domestic["code"].str.replace(r"^(\d{4})0$", r"\1", regex=True)
+
     # Build Yahoo Finance ticker symbol (e.g. "7203" → "7203.T")
     domestic = domestic[domestic["code"].str.match(r"^\d{4}$", na=False)].copy()
     domestic["code"] = domestic["code"] + ".T"
