@@ -55,3 +55,21 @@ def test_parse_jpx_excel_keeps_alphanumeric_domestic_codes(monkeypatch):
 
     assert result["code"].tolist() == ["130A.T", "275A.T"]
     assert result["name"].tolist() == ["Alpha", "Beta"]
+
+
+def test_parse_jpx_excel_uses_primary_code_column(monkeypatch):
+    sample = pd.DataFrame(
+        {
+            "コード": ["1301", "130A"],
+            "銘柄名": ["Prime", "Growth"],
+            "市場・商品区分": ["プライム（内国株式）", "グロース（内国株式）"],
+            "33業種コード": ["50", "10"],
+            "17業種コード": ["1", "2"],
+        }
+    )
+    monkeypatch.setattr(pd, "read_excel", lambda *args, **kwargs: sample)
+
+    result = parse_jpx_excel(b"dummy")
+
+    assert result["code"].tolist() == ["1301.T", "130A.T"]
+    assert result["name"].tolist() == ["Prime", "Growth"]
