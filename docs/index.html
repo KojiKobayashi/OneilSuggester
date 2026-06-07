@@ -325,8 +325,9 @@
         : "不明";
       const longCount  = allItems.filter(i => i.type === "long").length;
       const shortCount = allItems.filter(i => i.type === "short").length;
+      const canslimCount = allItems.filter(i => i.strategy === "canslim_long").length;
       document.getElementById("meta").textContent =
-        `更新日時: ${dt} JST　|　ロング ${longCount} 銘柄 / ショート ${shortCount} 銘柄`;
+        `更新日時: ${dt} JST　|　ロング ${longCount} 銘柄（CANSLIM ${canslimCount}） / ショート ${shortCount} 銘柄`;
 
       render();
     } catch (err) {
@@ -351,7 +352,11 @@
       const typeLong = item.type === "long";
       const badgeClass = typeLong ? "badge-long" : "badge-short";
       const fillClass  = typeLong ? "score-fill-long" : "score-fill-short";
-      const typeLabel  = typeLong ? "ロング" : "ショート";
+      const typeLabel  = item.strategy === "canslim_long"
+        ? "ロング (CANSLIM)"
+        : item.strategy === "japan_long"
+          ? "ロング (日本版)"
+          : "ショート";
       const pct = Math.round((item.score || 0) * 100);
 
       // Ticker → Yahoo Finance Japan link
