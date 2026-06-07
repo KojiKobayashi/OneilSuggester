@@ -12,7 +12,7 @@ from typing import Optional
 import pandas as pd
 
 from src import indicators
-from src.patterns import cup_with_handle, short_sell
+from src.patterns import canslim_lite, cup_with_handle, short_sell
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,9 @@ def score_ticker(
     code: str,
     name: str,
     df: pd.DataFrame,
+    market_in_uptrend: bool = True,
+    rs_score: Optional[float] = None,
+    fundamentals: Optional[dict] = None,
 ) -> Optional[dict]:
     """Run all pattern detectors against *df* and return the best result.
 
@@ -48,12 +51,35 @@ def score_ticker(
                     "code": code,
                     "name": name,
                     "type": "long",
+                    "strategy": "japan_long",
                     "score": cwh["score"],
                     "signals": cwh["signals"],
                 }
             )
     except Exception as exc:  # pylint: disable=broad-except
         logger.error("CWH detection failed for %s: %s", code, exc)
+
+    # ── CANSLIM-lite (long) ────────────────────────────────────────────────────
+    try:
+        canslim = canslim_lite.detect(
+            df,
+            market_in_uptrend=market_in_uptrend,
+            rs_score=rs_score,
+            fundamentals=fundamentals,
+        )
+        if canslim is not None:
+            results.append(
+                {
+                    "code": code,
+                    "name": name,
+                    "type": "long",
+                    "strategy": "canslim_long",
+                    "score": canslim["score"],
+                    "signals": canslim["signals"],
+                }
+            )
+    except Exception as exc:  # pylint: disable=broad-except
+        logger.error("CANSLIM-lite detection failed for %s: %s", code, exc)
 
     # ── Short-sell (short) ────────────────────────────────────────────────────
     try:
@@ -64,6 +90,7 @@ def score_ticker(
                     "code": code,
                     "name": name,
                     "type": "short",
+                    "strategy": "short_sell",
                     "score": short["score"],
                     "signals": short["signals"],
                 }
@@ -82,6 +109,9 @@ def score_ticker_all(
     code: str,
     name: str,
     df: pd.DataFrame,
+    market_in_uptrend: bool = True,
+    rs_score: Optional[float] = None,
+    fundamentals: Optional[dict] = None,
 ) -> list[dict]:
     """Run all pattern detectors against *df* and return every detected result.
 
@@ -112,12 +142,34 @@ def score_ticker_all(
                     "code": code,
                     "name": name,
                     "type": "long",
+                    "strategy": "japan_long",
                     "score": cwh["score"],
                     "signals": cwh["signals"],
                 }
             )
     except Exception as exc:  # pylint: disable=broad-except
         logger.error("CWH detection failed for %s: %s", code, exc)
+
+    try:
+        canslim = canslim_lite.detect(
+            df,
+            market_in_uptrend=market_in_uptrend,
+            rs_score=rs_score,
+            fundamentals=fundamentals,
+        )
+        if canslim is not None:
+            results.append(
+                {
+                    "code": code,
+                    "name": name,
+                    "type": "long",
+                    "strategy": "canslim_long",
+                    "score": canslim["score"],
+                    "signals": canslim["signals"],
+                }
+            )
+    except Exception as exc:  # pylint: disable=broad-except
+        logger.error("CANSLIM-lite detection failed for %s: %s", code, exc)
 
     try:
         short = short_sell.detect(df)
@@ -127,6 +179,7 @@ def score_ticker_all(
                     "code": code,
                     "name": name,
                     "type": "short",
+                    "strategy": "short_sell",
                     "score": short["score"],
                     "signals": short["signals"],
                 }

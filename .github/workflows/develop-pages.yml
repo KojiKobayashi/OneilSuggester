@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
+      - name: Update stock list
+        run: uv run python batch/update_stock_list.py
+
       - name: Run daily batch
         run: uv run python batch/run_daily.py
 

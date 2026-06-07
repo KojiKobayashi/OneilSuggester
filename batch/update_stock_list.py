@@ -2,15 +2,15 @@
 """Update ``data/stock_list.csv`` from JPX listed-securities data.
 
 This script downloads the latest list of TSE-listed securities from the JPX
-(Japan Exchange Group) website, filters for **Prime market** stocks, and
-writes the result to ``data/stock_list.csv``.
+(Japan Exchange Group) website, filters for domestic-equity market segments,
+and writes the result to ``data/stock_list.csv``.
 
 Usage::
 
     python batch/update_stock_list.py [--min-market-cap MIN_MARKET_CAP_BILLION]
 
 Requirements:
-    pip install requests pandas openpyxl
+    pip install requests pandas xlrd
 
 The JPX provides a fresh Excel file every business day at:
 https://www.jpx.co.jp/markets/statistics-equities/misc/01.html
@@ -44,8 +44,11 @@ JPX_DATA_URL = (
     "https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xls"
 )
 
-# Market segment name used in the JPX file for the Prime market
-PRIME_MARKET_SEGMENT = "プライム（内国株式）"
+TARGET_MARKET_SEGMENTS = {
+    "プライム（内国株式）",
+    "スタンダード（内国株式）",
+    "グロース（内国株式）",
+}
 
 
 def fetch_jpx_excel(url: str) -> bytes:
@@ -84,20 +87,20 @@ def parse_jpx_excel(data: bytes) -> pd.DataFrame:
     df["name"] = df["name"].str.strip()
     df["market"] = df["market"].str.strip()
 
-    # Filter for Prime market equities
-    prime = df[df["market"] == PRIME_MARKET_SEGMENT].copy()
-    logger.info("Prime market stocks: %d", len(prime))
+    # Filter for domestic equity market segments only.
+    domestic = df[df["market"].isin(TARGET_MARKET_SEGMENTS)].copy()
+    logger.info("Domestic equity stocks: %d", len(domestic))
 
     # Build Yahoo Finance ticker symbol (e.g. "7203" → "7203.T")
-    prime = prime[prime["code"].str.match(r"^\d{4}$", na=False)].copy()
-    prime["code"] = prime["code"] + ".T"
+    domestic = domestic[domestic["code"].str.match(r"^\d{4}$", na=False)].copy()
+    domestic["code"] = domestic["code"] + ".T"
 
-    return prime[["code", "name"]].reset_index(drop=True)
+    return domestic[["code", "name"]].reset_index(drop=True)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Update data/stock_list.csv from JPX Prime market data"
+        description="Update data/stock_list.csv from JPX domestic equity market data"
     )
     parser.add_argument(
         "--url",
@@ -120,7 +123,7 @@ def main() -> None:
 
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     df.to_csv(OUTPUT_PATH, index=False, encoding="utf-8")
-    logger.info("Saved %d Prime market stocks to %s", len(df), OUTPUT_PATH)
+    logger.info("Saved %d domestic equity stocks to %s", len(df), OUTPUT_PATH)
 
 
 if __name__ == "__main__":

@@ -1,2 +1,6 @@
 top_n: 20
-lookback_days: 180
+lookback_days: 400
+market_index: ^N225
+min_price: 300
+min_avg_dollar_volume: 200000000
+include_canslim_fundamentals: false

@@ -56,6 +56,7 @@ class TestScoreTicker:
             assert result["code"] == "9999.T"
             assert result["name"] == "ShortCo"
             assert result["type"] in ("long", "short")
+            assert result["strategy"] in ("japan_long", "canslim_long", "short_sell")
             assert 0.0 <= result["score"] <= 1.0
             assert isinstance(result["signals"], list)
 
@@ -64,7 +65,7 @@ class TestScoreTicker:
         df = _make_short_ohlcv(n=150)
         result = score_ticker("1234.T", "Acme", df)
         if result is not None:
-            for key in ("code", "name", "type", "score", "signals"):
+            for key in ("code", "name", "type", "strategy", "score", "signals"):
                 assert key in result
 
     def test_returns_none_for_insufficient_data(self):
@@ -104,6 +105,7 @@ class TestScoreTickerAll:
             assert r["code"] == "9999.T"
             assert r["name"] == "ShortCo"
             assert r["type"] in ("long", "short")
+            assert r["strategy"] in ("japan_long", "canslim_long", "short_sell")
             assert 0.0 <= r["score"] <= 1.0
             assert isinstance(r["signals"], list)
 
@@ -112,7 +114,7 @@ class TestScoreTickerAll:
         df = _make_short_ohlcv(n=150)
         results = score_ticker_all("1234.T", "Acme", df)
         for r in results:
-            for key in ("code", "name", "type", "score", "signals"):
+            for key in ("code", "name", "type", "strategy", "score", "signals"):
                 assert key in r
 
     def test_returns_empty_list_for_insufficient_data(self):
