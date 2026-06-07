@@ -1,0 +1,444 @@
+{
+  "generated_at": "2026-06-07T15:30:20Z",
+  "date": "2026-06-08",
+  "items": [
+    {
+      "code": "6902.T",
+      "name": "Denso",
+      "type": "long",
+      "score": 0.6009,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "3234.T",
+      "name": "Mori Trust",
+      "type": "long",
+      "score": 0.5632,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "7259.T",
+      "name": "Aisin",
+      "type": "long",
+      "score": 0.5533,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "1928.T",
+      "name": "Sekisui House",
+      "type": "long",
+      "score": 0.5362,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "8308.T",
+      "name": "Resona Holdings",
+      "type": "long",
+      "score": 0.5324,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction"
+      ]
+    },
+    {
+      "code": "9948.T",
+      "name": "Arc",
+      "type": "long",
+      "score": 0.5266,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "7282.T",
+      "name": "Toyoda Gosei",
+      "type": "long",
+      "score": 0.5121,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction"
+      ]
+    },
+    {
+      "code": "4826.T",
+      "name": "Computer Engineering & Consulting",
+      "type": "long",
+      "score": 0.5063,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "8331.T",
+      "name": "Chiba Bank",
+      "type": "long",
+      "score": 0.5048,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "2897.T",
+      "name": "Nisshin Seifun Group",
+      "type": "long",
+      "score": 0.503,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction"
+      ]
+    },
+    {
+      "code": "4324.T",
+      "name": "Dentsu Group",
+      "type": "long",
+      "score": 0.5012,
+      "signals": [
+        "cup detected",
+        "handle formed"
+      ]
+    },
+    {
+      "code": "5902.T",
+      "name": "Hokkan Holdings",
+      "type": "long",
+      "score": 0.4989,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "2811.T",
+      "name": "Kagome",
+      "type": "long",
+      "score": 0.4968,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction"
+      ]
+    },
+    {
+      "code": "1333.T",
+      "name": "Maruha Nichiro",
+      "type": "long",
+      "score": 0.491,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction"
+      ]
+    },
+    {
+      "code": "1808.T",
+      "name": "Haseko Corporation",
+      "type": "long",
+      "score": 0.4898,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction"
+      ]
+    },
+    {
+      "code": "9064.T",
+      "name": "Yamato Holdings",
+      "type": "long",
+      "score": 0.4894,
+      "signals": [
+        "cup detected",
+        "handle formed"
+      ]
+    },
+    {
+      "code": "8253.T",
+      "name": "Credit Saison",
+      "type": "long",
+      "score": 0.4858,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "7240.T",
+      "name": "NOK",
+      "type": "long",
+      "score": 0.4787,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction"
+      ]
+    },
+    {
+      "code": "4204.T",
+      "name": "Sekisui Chemical",
+      "type": "long",
+      "score": 0.4734,
+      "signals": [
+        "cup detected",
+        "handle formed"
+      ]
+    },
+    {
+      "code": "9001.T",
+      "name": "Tobu Railway",
+      "type": "long",
+      "score": 0.4734,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "9021.T",
+      "name": "West Japan Railway",
+      "type": "short",
+      "score": 0.9045,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4766.T",
+      "name": "Pasona Group",
+      "type": "short",
+      "score": 0.9025,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "3197.T",
+      "name": "Skylark Holdings",
+      "type": "short",
+      "score": 0.8835,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "3234.T",
+      "name": "Mori Trust",
+      "type": "short",
+      "score": 0.8654,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "9948.T",
+      "name": "Arc",
+      "type": "short",
+      "score": 0.8635,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "8804.T",
+      "name": "Tokyo Tatemono",
+      "type": "short",
+      "score": 0.8597,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "3360.T",
+      "name": "Ship Healthcare Holdings",
+      "type": "short",
+      "score": 0.8529,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4502.T",
+      "name": "Takeda Pharmaceutical",
+      "type": "short",
+      "score": 0.8487,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "9104.T",
+      "name": "Mitsui OSK Lines",
+      "type": "short",
+      "score": 0.8417,
+      "signals": [
+        "MA25 < MA75",
+        "MA25 crossed below MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4523.T",
+      "name": "Eisai",
+      "type": "short",
+      "score": 0.8285,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "9022.T",
+      "name": "Central Japan Railway",
+      "type": "short",
+      "score": 0.8277,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "1925.T",
+      "name": "Daiwa House Industry",
+      "type": "short",
+      "score": 0.8276,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "9503.T",
+      "name": "Kansai Electric Power",
+      "type": "short",
+      "score": 0.8271,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "9010.T",
+      "name": "Fujikyu Holdings",
+      "type": "short",
+      "score": 0.8269,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4519.T",
+      "name": "Chugai Pharmaceutical",
+      "type": "short",
+      "score": 0.8238,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "7011.T",
+      "name": "Mitsubishi Heavy Industries",
+      "type": "short",
+      "score": 0.8232,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "1928.T",
+      "name": "Sekisui House",
+      "type": "short",
+      "score": 0.8223,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4507.T",
+      "name": "Shionogi",
+      "type": "short",
+      "score": 0.814,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "2282.T",
+      "name": "NH Foods",
+      "type": "short",
+      "score": 0.8135,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "9501.T",
+      "name": "Tokyo Electric Power Holdings",
+      "type": "short",
+      "score": 0.8128,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    }
+  ]
+}
