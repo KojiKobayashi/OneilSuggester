@@ -1,105 +1,291 @@
 code,name
 7203.T,Toyota Motor
-6758.T,Sony Group
-9984.T,SoftBank Group
-6861.T,Keyence
-8306.T,Mitsubishi UFJ Financial Group
-9432.T,NTT
-7974.T,Nintendo
-4063.T,Shin-Etsu Chemical
-8035.T,Tokyo Electron
-9433.T,KDDI
-6954.T,Fanuc
-4543.T,Terumo
-2914.T,Japan Tobacco Industry
-8766.T,Tokio Marine Holdings
-6367.T,Daikin Industries
-9022.T,Central Japan Railway
 7267.T,Honda Motor
-3382.T,Seven & i Holdings
-8411.T,Mizuho Financial Group
-6501.T,Hitachi
-5108.T,Bridgestone
-6702.T,Fujitsu
-6752.T,Panasonic Holdings
-9020.T,East Japan Railway
-8316.T,Sumitomo Mitsui Financial Group
-4502.T,Takeda Pharmaceutical
-8058.T,Mitsubishi Corporation
-7741.T,HOYA
-7733.T,Olympus
-3407.T,Asahi Kasei
-8053.T,Sumitomo Corporation
-8031.T,Mitsui & Co
-4523.T,Eisai
-7751.T,Canon
-7832.T,Bandai Namco Holdings
-9021.T,West Japan Railway
-4519.T,Chugai Pharmaceutical
-6645.T,Omron
 7269.T,Suzuki Motor
-5401.T,Nippon Steel
-3659.T,Nexon
-4755.T,Rakuten Group
-9983.T,Fast Retailing
-6098.T,Recruit Holdings
-4661.T,Oriental Land
-9064.T,Yamato Holdings
-3289.T,Tokyu Fudosan Holdings
-8830.T,Sumitomo Realty & Development
-3003.T,Hulic
-1925.T,Daiwa House Industry
-1928.T,Sekisui House
-5713.T,Sumitomo Metal Mining
-4901.T,Fujifilm Holdings
-6971.T,Kyocera
-6723.T,Renesas Electronics
-7011.T,Mitsubishi Heavy Industries
+7270.T,Subaru
 7201.T,Nissan Motor
 7261.T,Mazda Motor
+7211.T,Mitsubishi Motors
+7202.T,Isuzu Motors
+7205.T,Hino Motors
+7272.T,Yamaha Motor
+7259.T,Aisin
+6902.T,Denso
+7282.T,Toyoda Gosei
+7309.T,Shimano
+6923.T,Stanley Electric
+7240.T,NOK
+7241.T,Futaba Industrial
+7242.T,KYB
+5108.T,Bridgestone
+7287.T,Nippon Seiki
+7283.T,Aisan Industry
+7292.T,Tachi-S
+6963.T,Rohm
+6758.T,Sony Group
+6861.T,Keyence
+8035.T,Tokyo Electron
+6723.T,Renesas Electronics
+6954.T,Fanuc
+6857.T,Advantest
+6920.T,Lasertec
+6981.T,Murata Manufacturing
 6762.T,TDK
+6976.T,Taiyo Yuden
+6971.T,Kyocera
+6594.T,Nidec
+6506.T,Yaskawa Electric
+6841.T,Yokogawa Electric
+6645.T,Omron
+6856.T,Horiba
+6869.T,Sysmex
+6849.T,Nihon Kohden
+6724.T,Epson
+6674.T,GS Yuasa
+6641.T,Fuji Electric
+6707.T,Sanken Electric
+6770.T,Alps Alpine
+6823.T,Rinnai
+6845.T,Azbil
+6951.T,Jeol
+6952.T,Casio Computer
+6965.T,Hamamatsu Photonics
+6966.T,Mitsui High-tec
+7751.T,Canon
+6702.T,Fujitsu
+6701.T,NEC
+6752.T,Panasonic Holdings
 6503.T,Mitsubishi Electric
+6501.T,Hitachi
+7011.T,Mitsubishi Heavy Industries
+7012.T,Kawasaki Heavy Industries
+7013.T,IHI
+7004.T,Hitachi Zosen
 6301.T,Komatsu
+6326.T,Kubota
+6302.T,Sumitomo Heavy Industries
+6305.T,Hitachi Construction Machinery
+9984.T,SoftBank Group
+9613.T,NTT Data Group
+4307.T,Nomura Research Institute
+4684.T,Obic
+4704.T,Trend Micro
+4324.T,Dentsu Group
+3697.T,SHIFT
+4739.T,Itochu Techno-Solutions
+4742.T,DTS
+4751.T,CyberAgent
+4689.T,LY Corporation
+4385.T,Mercari
+4826.T,Computer Engineering & Consulting
+4668.T,Meitec Group Holdings
+4716.T,Oracle Japan
+4732.T,USS
+4766.T,Pasona Group
+4748.T,Construction Project Consultant
+4676.T,Fuji Media Holdings
+9432.T,NTT
+9433.T,KDDI
+9434.T,SoftBank Corp
+9437.T,NTT DOCOMO
+4063.T,Shin-Etsu Chemical
+4005.T,Sumitomo Chemical
+4021.T,Nissan Chemical
+4042.T,Tosoh
+4061.T,Denka
+4062.T,Ibiden
+4091.T,Nippon Sanso Holdings
+4114.T,Nippon Shokubai
+4118.T,Kaneka
+4151.T,Kyowa Kirin
+4182.T,Mitsubishi Gas Chemical
+4183.T,Mitsui Chemicals
+4185.T,JSR
+4188.T,Mitsubishi Chemical Group
+4202.T,Daicel
+4204.T,Sekisui Chemical
+4272.T,Nippon Kayaku
+3407.T,Asahi Kasei
+3401.T,Teijin
+3402.T,Toray Industries
+3436.T,SUMCO
+4004.T,Resonac Holdings
+4208.T,UBE Industries
+5201.T,AGC
+6988.T,Nitto Denko
+4631.T,DIC
+4613.T,Kansai Paint
+4612.T,Nippon Paint Holdings
+4502.T,Takeda Pharmaceutical
+4519.T,Chugai Pharmaceutical
+4523.T,Eisai
+4506.T,Sumitomo Pharma
+4507.T,Shionogi
+4508.T,Mitsubishi Tanabe Pharma
+4511.T,Meiji Holdings
+4527.T,Rohto Pharmaceutical
+4530.T,Hisamitsu Pharmaceutical
+4536.T,Santen Pharmaceutical
+4540.T,Tsumura
+4578.T,Otsuka Holdings
+4543.T,Terumo
+4980.T,Dexerials
+8306.T,Mitsubishi UFJ Financial Group
+8316.T,Sumitomo Mitsui Financial Group
+8411.T,Mizuho Financial Group
+8309.T,Sumitomo Mitsui Trust Holdings
+8308.T,Resona Holdings
+7182.T,Japan Post Bank
+7186.T,Concordia Financial Group
+7181.T,Japan Post Insurance
+8331.T,Chiba Bank
+8355.T,Shizuoka Financial Group
+8332.T,Bank of Yokohama
+8361.T,Hachijuni Bank
+8385.T,Iyo Bank
+8396.T,Kyushu Financial Group
+8410.T,Seven Bank
+8366.T,Shiga Bank
+8334.T,Gunma Bank
+8386.T,Shikoku Bank
+8341.T,Seventyseven Bank
+8336.T,Musashino Bank
+8766.T,Tokio Marine Holdings
 8725.T,MS&AD Insurance Group Holdings
 8750.T,Dai-ichi Life Holdings
-7182.T,Japan Post Bank
-6305.T,Hitachi Construction Machinery
-3401.T,Teijin
-4188.T,Mitsubishi Chemical Group
-3436.T,SUMCO
-5201.T,AGC
-4004.T,Resonac Holdings
-4183.T,Mitsui Chemicals
-6302.T,Sumitomo Heavy Industries
-6472.T,NTN
-6473.T,JTEKT
-7270.T,Subaru
-6841.T,Yokogawa Electric
-6701.T,NEC
-6740.T,Japan Display
+8601.T,Daiwa Securities Group
+8604.T,Nomura Holdings
+8697.T,Japan Exchange Group
+8253.T,Credit Saison
+8591.T,Orix
+8001.T,Itochu Corporation
+8002.T,Marubeni
+8031.T,Mitsui & Co
+8053.T,Sumitomo Corporation
+8058.T,Mitsubishi Corporation
+8830.T,Sumitomo Realty & Development
+3003.T,Hulic
+3289.T,Tokyu Fudosan Holdings
+1925.T,Daiwa House Industry
+1928.T,Sekisui House
+3321.T,Meisei Industrial
+3231.T,Nomura Real Estate Holdings
+8801.T,Mitsui Fudosan
+8802.T,Mitsubishi Estate
+8804.T,Tokyo Tatemono
+8803.T,Heiwa Real Estate
+3234.T,Mori Trust
+5401.T,Nippon Steel
+5713.T,Sumitomo Metal Mining
+5411.T,JFE Holdings
+5801.T,Furukawa Electric
+5802.T,Sumitomo Electric Industries
+5803.T,Fujikura
+5812.T,Hitachi Cable
+5901.T,Toyo Seikan Group Holdings
+5902.T,Hokkan Holdings
+5912.T,Osaka Steel
+5020.T,ENEOS Holdings
+5019.T,Idemitsu Kosan
+9531.T,Tokyo Gas
+9532.T,Osaka Gas
+9502.T,Chubu Electric Power
+9501.T,Tokyo Electric Power Holdings
+9503.T,Kansai Electric Power
+9020.T,East Japan Railway
+9021.T,West Japan Railway
+9022.T,Central Japan Railway
+9064.T,Yamato Holdings
+9101.T,Nippon Yusen
+9104.T,Mitsui OSK Lines
+9107.T,Kawasaki Kisen Kaisha
+9303.T,Sumitomo Warehouse
+9062.T,Nippon Express Holdings
+9043.T,Kintetsu Group Holdings
+9007.T,Odakyu Electric Railway
+9008.T,Keio
+9009.T,Keisei Electric Railway
+9001.T,Tobu Railway
+9005.T,Tokyu
+9006.T,Keikyu
+9011.T,Sagami Railway
+9010.T,Fujikyu Holdings
+9983.T,Fast Retailing
+9843.T,Nitori Holdings
+3382.T,Seven & i Holdings
+8267.T,AEON
+9831.T,Yamada Holdings
+3099.T,Isetan Mitsukoshi Holdings
+3086.T,J. Front Retailing
+2651.T,Lawson
+9948.T,Arc
+7532.T,Pan Pacific International Holdings
+3197.T,Skylark Holdings
+2702.T,McDonald's Holdings Japan
+3360.T,Ship Healthcare Holdings
+4661.T,Oriental Land
+4681.T,Resorttrust
+2914.T,Japan Tobacco Industry
 2502.T,Asahi Group Holdings
 2503.T,Kirin Holdings
 2801.T,Kikkoman
 2802.T,Ajinomoto
 2871.T,Nichirei
 2282.T,NH Foods
-3086.T,J. Front Retailing
-3099.T,Isetan Mitsukoshi Holdings
-8267.T,AEON
-9831.T,Yamada Holdings
-9843.T,Nitori Holdings
-2413.T,M3
-3697.T,SHIFT
-4307.T,Nomura Research Institute
-3762.T,Techmatrix
-9613.T,NTT Data Group
-8601.T,Daiwa Securities Group
-8604.T,Nomura Holdings
-8697.T,Japan Exchange Group
-6594.T,Nidec
-6857.T,Advantest
-4912.T,Lion
+2897.T,Nisshin Seifun Group
+2810.T,House Foods Group
+2811.T,Kagome
+2875.T,Toyo Suisan Kaisha
+2809.T,Kewpie
+1333.T,Maruha Nichiro
+2590.T,DyDo Group Holdings
+2269.T,Meiji Holdings
+7733.T,Olympus
+7741.T,HOYA
+4901.T,Fujifilm Holdings
 4452.T,Kao
-4704.T,Trend Micro
+4911.T,Shiseido
+4924.T,Pola Orbis Holdings
+4919.T,Milbon
+4920.T,Pigeon
+4912.T,Lion
+4902.T,Konica Minolta
+7974.T,Nintendo
+7832.T,Bandai Namco Holdings
+3659.T,Nexon
+4755.T,Rakuten Group
+6098.T,Recruit Holdings
+2413.T,M3
+4816.T,Toei Animation
+4839.T,WOWOW
+2432.T,DeNA
 3861.T,Oji Holdings
 3863.T,Nippon Paper Industries
+4601.T,Dai Nippon Printing
+1801.T,Taisei Corporation
+1802.T,Obayashi Corporation
+1803.T,Shimizu Corporation
+1808.T,Haseko Corporation
+1812.T,Kajima Corporation
+1820.T,West Nippon Expressway
+1821.T,Sumitomo Mitsui Construction
+1824.T,Maeda Corporation
+1826.T,Sato Kogyo
+1944.T,Kinden Corporation
+1945.T,Toyo Construction
+1961.T,Sanki Engineering
+1963.T,JGC Holdings
+1964.T,Chuden Engineering Consultants
+1965.T,Teraoka Seisakusho
+1966.T,Takasago Thermal Engineering
+1967.T,IHI Plant Services
+1968.T,Taihei Dengyo Kaisha
+1975.T,JESCO Holdings
+1976.T,Kodensha
+1979.T,Ando Hazama
+1980.T,DAI-DAN
+1982.T,Nichiei Intec
+1983.T,Toshiba Plant Systems & Services
+1987.T,Sumitomo Electric Wiring Systems
+1990.T,Watanabe Construction
+1992.T,Kanamoto
