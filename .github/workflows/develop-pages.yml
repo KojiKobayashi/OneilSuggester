@@ -45,7 +45,6 @@ jobs:
         run: |
           # Save artefacts before switching branches
           mkdir -p /tmp/develop-pages/data
-          cp docs/data/latest.json /tmp/develop-pages/data/latest.json
           cp docs/data/index.json  /tmp/develop-pages/data/index.json
           # Copy the most recent dated JSON (first entry in index.json)
           LATEST_DATE=$(python3 -c "import json; d=json.load(open('docs/data/index.json')); print(d['dates'][0])")
@@ -60,7 +59,6 @@ jobs:
           # Update docs/develop/ with develop branch artefacts
           mkdir -p docs/develop/data
           cp /tmp/develop-pages/index.html                          docs/develop/index.html
-          cp /tmp/develop-pages/data/latest.json                    docs/develop/data/latest.json
           cp /tmp/develop-pages/data/index.json                     docs/develop/data/index.json
           cp "/tmp/develop-pages/data/${LATEST_DATE}.json"          "docs/develop/data/${LATEST_DATE}.json"
 

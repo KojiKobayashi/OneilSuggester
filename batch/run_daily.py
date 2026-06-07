@@ -48,6 +48,7 @@ DEFAULT_CONFIG = os.path.join(PROJECT_ROOT, "config.yaml")
 DEFAULT_STOCK_LIST = os.path.join(PROJECT_ROOT, "data", "stock_list.csv")
 DEFAULT_OUTPUT_DIR = os.path.join(PROJECT_ROOT, "docs", "data")
 INDEX_FILENAME = "index.json"
+LEGACY_LATEST_FILENAME = "latest.json"
 MAX_DATES_IN_INDEX = 30  # keep at most this many dates in the index
 
 _JST = ZoneInfo("Asia/Tokyo")
@@ -152,6 +153,16 @@ def update_index(output_dir: str, date_str: str) -> None:
         json.dump(index_data, fh, ensure_ascii=False, indent=2)
 
     logger.info("Updated index: %d dates", len(dates))
+
+
+def remove_legacy_latest_output(output_dir: str) -> None:
+    """Delete the legacy latest.json file so outputs stay date-based."""
+    legacy_latest_path = os.path.join(output_dir, LEGACY_LATEST_FILENAME)
+    if not os.path.exists(legacy_latest_path):
+        return
+
+    os.remove(legacy_latest_path)
+    logger.info("Removed legacy output file: %s", legacy_latest_path)
 
 
 def run(config_path: str, output_dir: str) -> None:
@@ -265,6 +276,8 @@ def run(config_path: str, output_dir: str) -> None:
         len(top_short),
         dated_path,
     )
+
+    remove_legacy_latest_output(output_dir)
 
     # Update the index
     update_index(output_dir, date_str)

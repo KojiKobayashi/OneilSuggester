@@ -13,7 +13,12 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from batch.run_daily import MAX_DATES_IN_INDEX, update_index  # noqa: E402
+from batch.run_daily import (  # noqa: E402
+    LEGACY_LATEST_FILENAME,
+    MAX_DATES_IN_INDEX,
+    remove_legacy_latest_output,
+    update_index,
+)
 
 
 class TestUpdateIndex:
@@ -59,3 +64,18 @@ class TestUpdateIndex:
         update_index(str(tmp_path), "2027-01-01")
         data = json.loads(index_path.read_text())
         assert len(data["dates"]) <= MAX_DATES_IN_INDEX
+
+
+class TestRemoveLegacyLatestOutput:
+    def test_removes_legacy_latest_json(self, tmp_path):
+        legacy_path = tmp_path / LEGACY_LATEST_FILENAME
+        legacy_path.write_text(json.dumps({"items": []}))
+
+        remove_legacy_latest_output(str(tmp_path))
+
+        assert not legacy_path.exists()
+
+    def test_ignores_missing_legacy_latest_json(self, tmp_path):
+        remove_legacy_latest_output(str(tmp_path))
+
+        assert not (tmp_path / LEGACY_LATEST_FILENAME).exists()
