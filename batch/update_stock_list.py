@@ -10,7 +10,7 @@ Usage::
     python batch/update_stock_list.py [--min-market-cap MIN_MARKET_CAP_BILLION]
 
 Requirements:
-    pip install requests pandas openpyxl
+    pip install requests pandas xlrd
 
 The JPX provides a fresh Excel file every business day at:
 https://www.jpx.co.jp/markets/statistics-equities/misc/01.html
