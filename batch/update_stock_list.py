@@ -63,16 +63,42 @@ def parse_jpx_excel(data: bytes) -> pd.DataFrame:
     df = pd.read_excel(io.BytesIO(data), dtype=str)
     logger.info("Downloaded %d rows from JPX", len(df))
 
-    # The column names differ slightly across file versions; find them flexibly.
+    # The column names differ slightly across file versions.
+    # Pick by explicit JPX header names first to avoid matching unrelated
+    # columns such as "33業種コード" / "17業種コード".
+    normalized_columns = {str(col).strip(): col for col in df.columns}
+
+    def pick_column(exact_names: list[str], contains_names: list[str]) -> str | None:
+        for name in exact_names:
+            if name in normalized_columns:
+                return normalized_columns[name]
+        for col in df.columns:
+            col_s = str(col).strip()
+            if any(token in col_s for token in contains_names):
+                return col
+        return None
+
     col_map: dict[str, str] = {}
-    for col in df.columns:
-        col_s = str(col).strip()
-        if "コード" in col_s:
-            col_map["code"] = col
-        elif "銘柄名" in col_s:
-            col_map["name"] = col
-        elif "市場" in col_s or "商品区分" in col_s:
-            col_map["market"] = col
+    code_col = pick_column(
+        exact_names=["コード", "銘柄コード"],
+        contains_names=["コード"],
+    )
+    if code_col is not None:
+        col_map["code"] = code_col
+
+    name_col = pick_column(
+        exact_names=["銘柄名", "銘柄名称"],
+        contains_names=["銘柄名"],
+    )
+    if name_col is not None:
+        col_map["name"] = name_col
+
+    market_col = pick_column(
+        exact_names=["市場・商品区分", "市場商品区分", "市場区分"],
+        contains_names=["市場・商品区分", "市場商品区分", "市場区分", "市場"],
+    )
+    if market_col is not None:
+        col_map["market"] = market_col
 
     missing = [k for k in ("code", "name", "market") if k not in col_map]
     if missing:
@@ -91,8 +117,12 @@ def parse_jpx_excel(data: bytes) -> pd.DataFrame:
     domestic = df[df["market"].isin(TARGET_MARKET_SEGMENTS)].copy()
     logger.info("Domestic equity stocks: %d", len(domestic))
 
-    # Build Yahoo Finance ticker symbol (e.g. "7203" → "7203.T")
-    domestic = domestic[domestic["code"].str.match(r"^\d{4}$", na=False)].copy()
+    # Build Yahoo Finance ticker symbol (e.g. "7203" → "7203.T").
+    # JPX domestic stock codes are typically 4 digits, but recent listings can
+    # use a 3-digit + alphabet suffix format such as "130A".
+    domestic = domestic[
+        domestic["code"].str.match(r"^(?:\d{4}|\d{3}[A-Z])$", na=False)
+    ].copy()
     domestic["code"] = domestic["code"] + ".T"
 
     return domestic[["code", "name"]].reset_index(drop=True)
