@@ -1,0 +1,745 @@
+{
+  "generated_at": "2026-06-25T21:47:46Z",
+  "date": "2026-06-26",
+  "items": [
+    {
+      "code": "1909.T",
+      "name": "日本ドライケミカル",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.7656,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "8276.T",
+      "name": "平和堂",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.7414,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "9064.T",
+      "name": "ヤマトホールディングス",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.7201,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "7283.T",
+      "name": "愛三工業",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.7158,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "6332.T",
+      "name": "月島ホールディングス",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.7137,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "4816.T",
+      "name": "東映アニメーション",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.71,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "1414.T",
+      "name": "ショーボンドホールディングス",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.7052,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "5644.T",
+      "name": "メタルアート",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.7045,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "4540.T",
+      "name": "ツムラ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6891,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "3245.T",
+      "name": "ディア・ライフ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6845,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "7943.T",
+      "name": "ニチハ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6831,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "2206.T",
+      "name": "江崎グリコ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6784,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "7552.T",
+      "name": "ハピネット",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6692,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "471A.T",
+      "name": "ＮＳグループ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6677,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "2782.T",
+      "name": "セリア",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6668,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "4516.T",
+      "name": "日本新薬",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6662,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "8473.T",
+      "name": "ＳＢＩホールディングス",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6617,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "2678.T",
+      "name": "アスクル",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6495,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "4922.T",
+      "name": "コーセーホールディングス",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6487,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "4985.T",
+      "name": "アース製薬",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.648,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "6871.T",
+      "name": "日本マイクロニクス",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.9736,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "breakout volume",
+        "relative strength 96%"
+      ]
+    },
+    {
+      "code": "8233.T",
+      "name": "高島屋",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.9602,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "breakout volume",
+        "relative strength 86%"
+      ]
+    },
+    {
+      "code": "6857.T",
+      "name": "アドバンテスト",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.9468,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "relative strength 95%"
+      ]
+    },
+    {
+      "code": "6703.T",
+      "name": "沖電気工業",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.9298,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "breakout volume",
+        "relative strength 90%"
+      ]
+    },
+    {
+      "code": "7717.T",
+      "name": "ブイ・テクノロジー",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.9295,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "breakout volume",
+        "relative strength 96%"
+      ]
+    },
+    {
+      "code": "5471.T",
+      "name": "大同特殊鋼",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.9256,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "relative strength 91%"
+      ]
+    },
+    {
+      "code": "2962.T",
+      "name": "テクニスコ",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.9121,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "breakout volume",
+        "relative strength 99%"
+      ]
+    },
+    {
+      "code": "7735.T",
+      "name": "ＳＣＲＥＥＮホールディングス",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.9101,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "relative strength 95%"
+      ]
+    },
+    {
+      "code": "6668.T",
+      "name": "アドテック　プラズマ　テクノロジー",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.9056,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "breakout volume",
+        "relative strength 97%"
+      ]
+    },
+    {
+      "code": "6997.T",
+      "name": "日本ケミコン",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.9014,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "relative strength 99%"
+      ]
+    },
+    {
+      "code": "7245.T",
+      "name": "大同メタル工業",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.8996,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "breakout volume",
+        "relative strength 93%"
+      ]
+    },
+    {
+      "code": "6327.T",
+      "name": "北川精機",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.8989,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "relative strength 100%"
+      ]
+    },
+    {
+      "code": "5333.T",
+      "name": "ＮＧＫ",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.8965,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "relative strength 97%"
+      ]
+    },
+    {
+      "code": "6135.T",
+      "name": "牧野フライス製作所",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.8952,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "breakout volume",
+        "relative strength 70%"
+      ]
+    },
+    {
+      "code": "2579.T",
+      "name": "コカ・コーラ　ボトラーズジャパンホールディングス",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.8951,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "breakout volume",
+        "relative strength 73%"
+      ]
+    },
+    {
+      "code": "6752.T",
+      "name": "パナソニック　ホールディングス",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.8936,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "relative strength 93%"
+      ]
+    },
+    {
+      "code": "7173.T",
+      "name": "東京きらぼしフィナンシャルグループ",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.8872,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "relative strength 85%"
+      ]
+    },
+    {
+      "code": "6707.T",
+      "name": "サンケン電気",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.8848,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "breakout volume",
+        "relative strength 81%"
+      ]
+    },
+    {
+      "code": "6963.T",
+      "name": "ローム",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.8807,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "relative strength 95%"
+      ]
+    },
+    {
+      "code": "7762.T",
+      "name": "シチズン時計",
+      "type": "long",
+      "strategy": "canslim_long",
+      "score": 0.875,
+      "signals": [
+        "price above MA25/MA75",
+        "near 52-week high",
+        "relative strength 92%"
+      ]
+    },
+    {
+      "code": "5857.T",
+      "name": "ＡＲＥホールディングス",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 1.0,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "6027.T",
+      "name": "弁護士ドットコム",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.9879,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "7972.T",
+      "name": "イトーキ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.94,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "8031.T",
+      "name": "三井物産",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.907,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "2815.T",
+      "name": "アリアケジャパン",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.9054,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "2206.T",
+      "name": "江崎グリコ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.9051,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4432.T",
+      "name": "ウイングアーク１ｓｔ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8989,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "6908.T",
+      "name": "イリソ電子工業",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8943,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "7157.T",
+      "name": "ライフネット生命保険",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8938,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "2292.T",
+      "name": "Ｓ　Ｆｏｏｄｓ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8907,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4922.T",
+      "name": "コーセーホールディングス",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8888,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "6088.T",
+      "name": "シグマクシス・ホールディングス",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8852,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "9044.T",
+      "name": "ＮＡＮＫＡＩ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8823,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "7456.T",
+      "name": "松田産業",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8801,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "8179.T",
+      "name": "ロイヤルホールディングス",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8772,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "2931.T",
+      "name": "ユーグレナ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8756,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4569.T",
+      "name": "杏林製薬",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8746,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "5440.T",
+      "name": "共英製鋼",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.871,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4816.T",
+      "name": "東映アニメーション",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8702,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "3482.T",
+      "name": "ロードスターキャピタル",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8694,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    }
+  ]
+}
