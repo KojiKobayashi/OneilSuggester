@@ -1,0 +1,502 @@
+{
+  "generated_at": "2026-07-15T21:31:08Z",
+  "date": "2026-07-16",
+  "items": [
+    {
+      "code": "1815.T",
+      "name": "鉄建建設",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.7956,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "6209.T",
+      "name": "リケンＮＰＲ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.7349,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "6326.T",
+      "name": "クボタ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.7107,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "3402.T",
+      "name": "東レ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6997,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "2768.T",
+      "name": "双日",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6959,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "5406.T",
+      "name": "神戸製鋼所",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.691,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "5842.T",
+      "name": "インテグラル",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6837,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "1719.T",
+      "name": "安藤・間",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6595,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "2695.T",
+      "name": "くら寿司",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.645,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "3962.T",
+      "name": "チェンジホールディングス",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6446,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "2212.T",
+      "name": "山崎製パン",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6419,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "1605.T",
+      "name": "ＩＮＰＥＸ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6405,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "6196.T",
+      "name": "ストライクグループ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6401,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "5423.T",
+      "name": "東京製鐵",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.636,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "6908.T",
+      "name": "イリソ電子工業",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6336,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "5401.T",
+      "name": "日本製鉄",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6321,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "3048.T",
+      "name": "ビックカメラ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6317,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "1332.T",
+      "name": "ニッスイ",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6309,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "3407.T",
+      "name": "旭化成",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6184,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "3543.T",
+      "name": "コメダホールディングス",
+      "type": "long",
+      "strategy": "japan_long",
+      "score": 0.6166,
+      "signals": [
+        "cup detected",
+        "handle formed",
+        "volume contraction",
+        "volume expansion at breakout"
+      ]
+    },
+    {
+      "code": "5711.T",
+      "name": "三菱マテリアル",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 1.0,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "6521.T",
+      "name": "オキサイド",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.985,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "402A.T",
+      "name": "アクセルスペースホールディングス",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.9344,
+      "signals": [
+        "MA25 < MA75",
+        "MA25 crossed below MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "6908.T",
+      "name": "イリソ電子工業",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.9094,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4813.T",
+      "name": "ＡＣＣＥＳＳ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8744,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "5714.T",
+      "name": "ＤＯＷＡホールディングス",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8573,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "5715.T",
+      "name": "古河機械金属",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8487,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "5857.T",
+      "name": "ＡＲＥホールディングス",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8425,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "5741.T",
+      "name": "ＵＡＣＪ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8325,
+      "signals": [
+        "MA25 < MA75",
+        "MA25 crossed below MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "6946.T",
+      "name": "日本アビオニクス",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.83,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "5713.T",
+      "name": "住友金属鉱山",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8291,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "1407.T",
+      "name": "ウエストホールディングス",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8283,
+      "signals": [
+        "MA25 < MA75",
+        "MA25 crossed below MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "4499.T",
+      "name": "Ｓｐｅｅｅ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8273,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "3103.T",
+      "name": "ユニチカ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8271,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "464A.T",
+      "name": "ＱＰＳホールディングス",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8199,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "1663.T",
+      "name": "Ｋ＆Ｏエナジーグループ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8189,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "1885.T",
+      "name": "東亜建設工業",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.816,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "5805.T",
+      "name": "ＳＷＣＣ",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.8054,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "186A.T",
+      "name": "アストロスケールホールディングス",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.7969,
+      "signals": [
+        "MA25 < MA75",
+        "MA25 crossed below MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    },
+    {
+      "code": "5019.T",
+      "name": "出光興産",
+      "type": "short",
+      "strategy": "short_sell",
+      "score": 0.7953,
+      "signals": [
+        "MA25 < MA75",
+        "rally capped at MA25",
+        "lower highs"
+      ]
+    }
+  ]
+}
