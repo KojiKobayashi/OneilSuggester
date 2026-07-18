@@ -2,8 +2,8 @@ name: Daily Stock Scan
 
 on:
   schedule:
-    # Run every day at UTC 21:00 (= JST 06:00 the next morning)
-    - cron: '0 21 * * *'
+    # Run every Monday at UTC 21:00 (= JST Tuesday 06:00)
+    - cron: '0 21 * * 1'
   workflow_dispatch:   # allow manual runs from the GitHub UI
 
 permissions:
