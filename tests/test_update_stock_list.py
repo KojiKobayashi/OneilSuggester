@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import sys
+import urllib.error
 
 import pandas as pd
 
@@ -12,6 +13,7 @@ ROOT = os.path.dirname(PROJECT_ROOT)
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
+from batch import update_stock_list  # noqa: E402
 from batch.update_stock_list import parse_jpx_excel  # noqa: E402
 
 
@@ -73,3 +75,47 @@ def test_parse_jpx_excel_uses_primary_code_column(monkeypatch):
 
     assert result["code"].tolist() == ["1301.T", "130A.T"]
     assert result["name"].tolist() == ["Prime", "Growth"]
+
+
+def test_resolve_jpx_data_url_picks_data_file_link(monkeypatch):
+    html = b"""
+    <html>
+      <body>
+        <a href="/markets/statistics-equities/misc/newtoken-att/data_j.xlsx">download</a>
+      </body>
+    </html>
+    """
+    monkeypatch.setattr(update_stock_list, "_download", lambda *_args, **_kwargs: html)
+
+    result = update_stock_list.resolve_jpx_data_url()
+
+    assert result.endswith("/markets/statistics-equities/misc/newtoken-att/data_j.xlsx")
+
+
+def test_fetch_jpx_excel_retries_with_resolved_url_on_default_404(monkeypatch):
+    fallback_url = "https://www.jpx.co.jp/markets/statistics-equities/misc/newtoken-att/data_j.xls"
+    calls: list[str] = []
+
+    def fake_download(url: str) -> bytes:
+        calls.append(url)
+        if url == update_stock_list.JPX_DATA_URL:
+            raise urllib.error.HTTPError(url, 404, "Not Found", hdrs=None, fp=None)
+        if url == update_stock_list.JPX_LIST_PAGE_URL:
+            return (
+                b'<a href="/markets/statistics-equities/misc/newtoken-att/data_j.xls">'
+                b"download</a>"
+            )
+        if url == fallback_url:
+            return b"excel-bytes"
+        raise AssertionError(f"unexpected url: {url}")
+
+    monkeypatch.setattr(update_stock_list, "_download", fake_download)
+
+    result = update_stock_list.fetch_jpx_excel(update_stock_list.JPX_DATA_URL)
+
+    assert result == b"excel-bytes"
+    assert calls == [
+        update_stock_list.JPX_DATA_URL,
+        update_stock_list.JPX_LIST_PAGE_URL,
+        fallback_url,
+    ]
