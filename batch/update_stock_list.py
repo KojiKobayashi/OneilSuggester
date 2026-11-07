@@ -25,7 +25,10 @@ import argparse
 import io
 import logging
 import os
+import re
 import sys
+import urllib.error
+import urllib.parse
 import urllib.request
 
 import pandas as pd
@@ -43,6 +46,7 @@ OUTPUT_PATH = os.path.join(PROJECT_ROOT, "data", "stock_list.csv")
 JPX_DATA_URL = (
     "https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xls"
 )
+JPX_LIST_PAGE_URL = "https://www.jpx.co.jp/markets/statistics-equities/misc/01.html"
 
 TARGET_MARKET_SEGMENTS = {
     "プライム（内国株式）",
@@ -51,11 +55,37 @@ TARGET_MARKET_SEGMENTS = {
 }
 
 
-def fetch_jpx_excel(url: str) -> bytes:
-    logger.info("Downloading JPX stock list from %s", url)
+def _download(url: str) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=30) as resp:
         return resp.read()
+
+
+def resolve_jpx_data_url(list_page_url: str = JPX_LIST_PAGE_URL) -> str:
+    logger.info("Resolving latest JPX stock list URL from %s", list_page_url)
+    html = _download(list_page_url).decode("utf-8", errors="ignore")
+
+    # JPX periodically changes the attachment token path. Find the latest
+    # "data_j.xls(x)" attachment URL from the listing page instead of relying
+    # on a static token.
+    matches = re.findall(r'href=["\']([^"\']*data_j\.xls[x]?)["\']', html, flags=re.IGNORECASE)
+    if not matches:
+        raise ValueError("Could not find JPX data_j.xls/data_j.xlsx URL on list page")
+
+    return urllib.parse.urljoin(list_page_url, matches[0])
+
+
+def fetch_jpx_excel(url: str) -> bytes:
+    logger.info("Downloading JPX stock list from %s", url)
+    try:
+        return _download(url)
+    except urllib.error.HTTPError as exc:
+        if exc.code != 404 or url != JPX_DATA_URL:
+            raise
+
+    fallback_url = resolve_jpx_data_url()
+    logger.info("Retrying JPX stock list download with resolved URL: %s", fallback_url)
+    return _download(fallback_url)
 
 
 def parse_jpx_excel(data: bytes) -> pd.DataFrame:
